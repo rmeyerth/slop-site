@@ -4,32 +4,32 @@ import styles from './HomepageFeatures.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Dynamic Configuration',
+    Svg: require('../../static/img/Wrench_Icon.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Deploy code to your project dynamically. Expressions are stored and executed in
+        plain text which can be stored on database records, documents, files or anywhere!
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('../../static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Powered by Java',
+    Svg: require('../../static/img/rocket.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Reference and pass Java objects directly in SLOP expressions. Native calls on objects
+        unlock the power of Java and remove the limits of what's possible.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
+    title: 'Extensible',
+    Svg: require('../../static/img/construction-cone.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Too restricted or doesn't have the feature you're looking for? It's very easy to expand
+        the language by writing functions or adding your own literals, operations and statements.
       </>
     ),
   },

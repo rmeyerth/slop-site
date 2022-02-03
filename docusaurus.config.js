@@ -6,8 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Single Line Operations Processor (SLOP)',
-  tagline: 'Dynamically configure away from deployments',
+  title: 'Single Line Operations Processor',
+  tagline: 'Dynamically configure projects free from code deployments',
   url: 'http://www.slop.dev',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -75,7 +75,11 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
+                label: 'Quick Start',
+                to: '/docs/quick-start',
+              },
+              {
+                label: 'Documentation',
                 to: '/docs/intro',
               },
             ],
@@ -84,16 +88,8 @@ const config = {
             title: 'Community',
             items: [
               {
-                label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-              },
-              {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
-              },
-              {
-                label: 'Twitter',
-                href: 'https://twitter.com/docusaurus',
+                label: 'Forum',
+                href: 'http://slop.boards.net',
               },
             ],
           },
@@ -101,12 +97,12 @@ const config = {
             title: 'More',
             items: [
               {
-                label: 'Blog',
+                label: 'News',
                 to: '/blog',
               },
               {
-                label: 'GitHub',
-                href: 'https://github.com/facebook/docusaurus',
+                label: 'Gitlab',
+                href: 'https://gitlab.com/tronied/slop',
               },
             ],
           },
