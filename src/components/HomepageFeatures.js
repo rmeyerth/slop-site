@@ -28,8 +28,8 @@ const FeatureList = [
     Svg: require('../../static/img/construction-cone.svg').default,
     description: (
       <>
-        Too restricted or doesn't have the feature you're looking for? It's very easy to expand
-        the language by writing functions or adding your own literals, operations and statements.
+        Doesn't have the feature you're looking for? It's very easy to expand the language by
+        writing functions or adding your own literals, operations and statements.
       </>
     ),
   },
