@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Single Line Operations Processor',
-  tagline: 'Dynamically configure projects free from code deployments',
+  tagline: 'Dynamically configure your projects away from code deployments',
   url: 'http://www.slop.dev',
   baseUrl: '/',
   onBrokenLinks: 'throw',
