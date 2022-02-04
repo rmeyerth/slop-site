@@ -75,7 +75,7 @@ const config = {
               },
               {
                 label: 'Documentation',
-                to: '/docs',
+                to: '/docs/intro',
               },
             ],
           },
