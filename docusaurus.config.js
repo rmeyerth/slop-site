@@ -49,12 +49,7 @@ const config = {
         },
         items: [
           {to: '/blog', label: 'News', position: 'left'},
-          {
-            type: 'doc',
-            docId: 'quick-start',
-            position: 'left',
-            label: 'Quick Start',
-          },
+          {to: '/quick-start', label: 'Quick Start', position: 'left'},
           {
             type: 'doc',
             docId: 'intro',
@@ -112,6 +107,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+        additionalLanguages: ['java'],
       },
     }),
 };
