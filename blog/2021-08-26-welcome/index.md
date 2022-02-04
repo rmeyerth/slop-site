@@ -1,25 +1,20 @@
 ---
 slug: welcome
 title: Welcome
-authors: [slorber, yangshun]
-tags: [facebook, hello, docusaurus]
+authors: [tronied]
+tags: [slop]
 ---
 
-[Docusaurus blogging features](https://docusaurus.io/docs/blog) are powered by the [blog plugin](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-blog).
+Welcome to my first post on the new SLOP website! It is still very much a work in progress but feel
+with the main hurdles past me that I can see the finish line. Over the last couple of months I have:
+1. Finished the project so that now I consider it to be code complete
+2. Written a fair amount of the documentation which can be seen here
+3. Published the project to Maven Central
 
-Simply add Markdown files (or folders) to the `blog` directory.
+In the upcoming months I will look to do the following:
 
-Regular blog authors can be added to `authors.yml`.
+1. Finish of the documentation
+2. Gradually complete the sample projects and document each
+3. Start to advertise a bit!
 
-The blog post date can be extracted from filenames, such as:
-
-- `2019-05-30-welcome.md`
-- `2019-05-30-welcome/index.md`
-
-A blog post folder can be convenient to co-locate blog post images:
-
-![Docusaurus Plushie](./docusaurus-plushie-banner.jpeg)
-
-The blog supports tags as well!
-
-**And if you don't want a blog**: just delete this directory, and use `blog: false` in your Docusaurus config.
+There will be many more updates so please do keep checking back.
