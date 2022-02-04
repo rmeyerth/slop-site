@@ -71,11 +71,11 @@ const config = {
             items: [
               {
                 label: 'Quick Start',
-                to: '/docs/quick-start',
+                to: '/quick-start',
               },
               {
                 label: 'Documentation',
-                to: '/docs/intro',
+                to: '/docs',
               },
             ],
           },
