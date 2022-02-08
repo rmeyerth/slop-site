@@ -6,9 +6,9 @@ sidebar_position: 3
 The repeat statement is a collection of one or more expressions that is repeated until a condition is met. This is
 similar to the for loop in most languages which consist of three parts. These are:
 
-1) The loop variable definition and method of progression
-2) A value to initialize the loop variable
-3) The condition that will be checked every iteration. If it is met then the loop will exit.
+1. The loop variable definition and method of progression
+2. A value to initialize the loop variable
+3. The condition that will be checked every iteration. If it is met then the loop will exit.
 
 The body of the repeat statement is a series of separate expression Strings that are separated by semi-colons. Let's look
 at the simplest example:

@@ -75,7 +75,7 @@ OperationToken(tokens = [
 This is a very simple example, but what happens if we have embedded statements? This is where the stack comes more 
 into play. Let's take the following expression as an example:
 ```
-((1 - 2) * 3) / 4 < 1
+((1 - 2) * 3) / 4 < -1 ? "no" : "yes"
 ```
 In the above although it may look simple, we have 3 levels of statements being processed. For this example I will
 describe each stage and provide the state of the stack. In the beginning our stack is empty and our first read
