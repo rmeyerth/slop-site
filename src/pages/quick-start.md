@@ -44,5 +44,5 @@ This will print the fibonacci sequence up to 12 places:
 ```bash
 Result: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 ```
-...and that's it! These are simple examples to get you started, but please take a look at the following sections to 
-discover more of SLOP's features, example projects and even how to extend it yourself. 
+...and that's it! These are simple examples to get you started, but please take a look at the documentation section to 
+discover more of SLOP's features, sample projects and even how to extend it yourself. 
