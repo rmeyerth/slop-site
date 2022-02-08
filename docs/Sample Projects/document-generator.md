@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 
-# Document Generator (TBD)
+# Document Generator
 Using Apache POI and template document that contain SLOP expressions, it would have the following features: 
 - Tables can be generated from a Collection (context object or referenced field)
 - Conditionals can be used to add / omit sections or watermarks

@@ -28,6 +28,3 @@ This would just return the names of only those individuals older than 40. This u
 as you see we are only setting the result by using a conditional where the false case return an unused
 'null' value. This could be fixed by adding a single conditional 'if' statement, but this exceeds the 
 scope for this simple scenario. Please see [Adding Statements](#adding-statements) for more information.
-
-**NOTE**: There is a known issue which has already been fixed and will be released in the upcoming 
-version 1.1

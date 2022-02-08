@@ -41,7 +41,7 @@ GrammarGroup(position = 0, tokens = [
     GrammarValue('('),
     GrammarExpression(),
     GrammarValue(')')
-]
+])
 ```
 All pattern tokens (even if they are not part of a defined group in the pattern) will be part of a GrammarGroup. This 
 is because the GrammarGroup is used to record and track the current position within the token. If we assume that we 
@@ -142,8 +142,9 @@ OperationToken(position = 3, tokens = [
 ])
 ```
 The OperationToken as the last remaining token is popped from the top of the stack and added to the resulting list of tokens.
-Two more tokens are read and added to the token list which are an OperatorToken(/) and an IntegerToken(4). The list of
-tokens looks like the following:
+Four more tokens are read and added to the token list which are the OperatorToken(/), IntegerToken(4), OperatorToken(<) and
+finally an IntegerToken(-1). Without moving into the job of the Parser, if the expression ended here this would result in
+a condition which would result in a Boolean. As it is, the list of tokens looks like the following:
 ```
 [== Resulting Tokens ==]
 OperationToken(position = 3, tokens = [
@@ -160,7 +161,9 @@ OperationToken(position = 3, tokens = [
     ]),    
 ]),
 OperatorToken(/),
-IntegerToken(4)
+IntegerToken(4),
+OperatorToken(<),
+IntegerToken(-1)
 ```
 Something then unexpected happens where we find a '?' token. This is part of a token called a Conditional which has the
 following grammar pattern:
@@ -190,8 +193,172 @@ ConditionalToken(position = 2, tokens = [
             IntegerToken(3)
         ]),
         OperatorToken(/),
-        IntegerToken(4)
+        IntegerToken(4),
+        OperatorToken(<),
+        IntegerToken(-1)
     ]),    
 ])
 ```
-To be continued... (Don't forget about repeating grammar groups!)
+As the active token is now a different grammar expression, all captured tokens will be written to a new token group. As
+there is only a single String token, that is added to that. The next token is a ':' which matches the next logical token 
+of the head of the stack in the Conditional statement. The position is incremented again to the position past the last
+token so that it now points to position 4 which is the last 'expr' capture group. As the last remaining token is a
+solitary StringToken as well, the final picture of the stack prior to the ConditionalToken being removed looks like the
+following:
+```
+[== Stack ==]
+ConditionalToken(position = 4, tokens = [
+    TokenGroup(tokens = [    
+        OperationToken(position = 3, tokens = [
+            ...
+        ]),
+        ...
+        IntegerToken(-1)        
+    ]),
+    TokenGroup(tokens = [    
+        StringToken("no")
+    ]),
+    TokenGroup(tokens = [    
+        StringToken("yes")
+    ]),        
+])
+```
+As the lexer has now reached the end of the expression and there are no further tokens to be added, a finalizeExpression
+method is called which removes any tokens still on the stack (in this case the ConditionalToken) and adds it to the 
+resulting token list. These are then returned to the SLOPProcessor and can either be serialized to a String or File or
+passed to the Parser for evaluation and resolution.
+
+## Additional Grammar / Pattern Flags
+In the above section we have covered how pattern tokens are used by the Lexer to keep track of where in the statement 
+read tokens belong. There are several grammar flags which cause this flow to be disrupted or change. The first of these
+is the '+' flag which can be applied to any Grammar Group in a String. For example, taking the FieldToken pattern we
+can see this being used to represent a repeating pattern:
+```bash
+( val ( '[' expr ']' )? '.'? )+
+```
+The entire pattern is wrapped in a parent grammar group which can be repeated one or more times (denoted by the following 
+'+' character). Inside is a 'val' representing a single value capture group with an optional following grammar group 
+(denoted by the following '?') with a set of square brackets surrounding an expression capture group. Finally this is 
+followed by an optional syntax period character ('.'). If we provide some examples it should become clear as to the
+values it is trying to capture:
+```
+object.field
+object.collection[0].field
+object.map["value" + 1]
+```
+As can be seen some of the examples have index / key references whilst others do not. This is where the '?' tokens allows
+optional values to be captured. Going further we can split the middle example up to the following:
+```
+object.
+collection[0].
+field
+```
+Each one represents an individual capture event of the repeated grammar group pattern defined above. Likewise, each one
+will be captured in its own TokenGroup. Let's then start running over the above example and see how the pattern tokens
+are structured and see how the Lexer handles them. The grammar lexer will output the following pattern tokens onto the
+FieldToken when SLOP is initialised:
+```
+GrammarGroup(position = 0, multiple = true, tokens = [
+    GrammarValue(capture = true),
+    GrammarGroup(position = 0, optional = true, tokens = [
+        GrammarValue('['),
+        GrammarExpression(),
+        GrammarValue(']'),
+    ]),
+    GrammarValue(value = '.', optional = true)
+])
+```
+Reading the expression String 'object.collection[0].field', the first read token is a TokenValue('object') and so far
+no match occurs is found in our pattern as it is too generic. Keep in mind that a match only happens if an identifying 
+tag (typically syntax) is read. The next token however is a match for the '.' found following the optional grammar group.
+This may seem a bit odd as we have skipped the entire second GrammarGroup, but keep in mind the Lexer will only apply 
+strict matching if it is required. As this is optional, it skipped ahead and looked for a matching token which it found 
+in the optional GrammarValue('.'). Upon finding this match, a new instance of the FieldToken is added to the top of the
+stack and TokenValue('object') is added into a TokenGroup.
+
+The position of the group is then set to the position after the '.' which in this case exceeds the number of pattern 
+tokens in the group. A check is triggered and since the group supports multiple occurances, it's position and all
+contained group positions are reset back to their initial positions. At this stage the state of the stack looks like
+the following:
+```
+[== Stack ==]
+FieldToken(tokens = [
+    TokenGroup(tokens = [    
+        TokenValue('object')  
+    ])  
+])
+```
+The next token is another TokenValue('collection') which gets added to the short term memory list of tokens. This is used
+to store recently read tokens which we're not quite sure what to do with yet. The next token is a TokenValue('[') which
+triggers a match in the FieldToken on the stack but for a different reason than the previous. On this occasion instead 
+of skipping over the optional group it has found a match in the starting syntax token. Looking at the pattern tokens
+again we can see how the positions are updated to reflect this:
+```
+GrammarGroup(position = 1, multiple = true, tokens = [
+    GrammarValue(capture = true),
+    GrammarGroup(position = 1, optional = true, tokens = [
+        GrammarValue('['),
+        GrammarExpression(),
+        GrammarValue(']'),
+    ]),
+    GrammarValue(value = '.', optional = true)
+])
+```
+The current active pattern token is a grammar expression and will be used to capture any tokens found within the square
+brackets. In our case it is just a single IntegerToken(0) and after the subsequent closing TokenValue(']') is read, the
+stack looks like the following:
+```
+[== Stack ==]
+FieldToken(tokens = [
+    TokenGroup(tokens = [
+        TokenGroup(tokens = [    
+            TokenValue('object')  
+        ]),
+        TokenGroup(tokens = [    
+            TokenValue('collection'),
+            TokenGroup(tokens = [
+                IntegerToken(0)
+            ])  
+        ])
+    ])        
+])
+```
+The pattern tokens with their positions are the following:
+```
+[== Pattern Tokens ==]
+GrammarGroup(position = 2, multiple = true, tokens = [
+    GrammarValue(capture = true),
+    GrammarGroup(position = 3, optional = true, tokens = [
+        GrammarValue('['),
+        GrammarExpression(),
+        GrammarValue(']'),
+    ]),
+    GrammarValue(value = '.', optional = true)
+])
+```
+The current active token is pointing to the GrammarValue('.') which is the next token read by the Lexer. Again the
+position is updated and the group is marked as complete, a check is performed to determine whether it can be captured
+multiple times (which it can) and again the position of the group reset.
+
+Finally we are on the last iteration through the FieldToken with the last remaining token being read which is a 
+GrammarValue('field'). In this case though we have no clear closing syntax as fields are not followed by a '.'. This
+is where the Lexer has to use a bit of deductive reasoning which differs depending on the scenario. In our case we
+have a single value and the end of the expression was met. As such, it is a safe bet to add it to the top stack 
+item. If we had the following scenario however:
+```
+object.collection[0].field * 40
+```
+The Lexer would then look at the top item in the stack and the following tokens to make a best guess. In this situation
+the FieldToken does support a single TokenValue and is a valid match against the tokens pattern. Since that has a higher
+probability of a match rather than existing as a single TokenValue between the statement and an Operator / Integer token, 
+again it is safe to assume that it can be added to that item.
+
+This covers the process by which the Lexer matches tokens against statements using pattern tokens and how it deals with 
+the different types of grammar flags. As mentioned previously, this information is not strictly required for writing your
+own statements, but it is useful to understand why tokens are organised into the groups they are and the mechanism used
+to facilitate this.
+
+**NOTE**: Although not covered here, when a grammar group is marked to capture multiple sets of tokens (as above), if 
+it is found that the group is in its reset state (complete) but a following token after that group triggers a match, 
+the token position will be moved to that location to avoid being stuck in an endless cycle of repetitions. The lexer 
+uses intelligent look ahead in this scenario.

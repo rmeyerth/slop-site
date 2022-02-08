@@ -8,12 +8,12 @@ Create a new project declaring the following dependency in maven:
 <dependency>
   <groupId>dev.slop</groupId>
   <artifactId>slop-core</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
 </dependency>
 ``` 
 or gradle:
 ```groovy
-implementation 'dev.slop:slop-core:1.0'
+implementation 'dev.slop:slop-core:1.1'
 ```
 Add a new Java class with the following:
 ```java
