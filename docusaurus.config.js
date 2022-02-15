@@ -6,7 +6,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Single Line Operations Processor',
+  title: 'SLOP - Extensible Expression Language',
   tagline: 'Dynamically configure your projects away from code deployments',
   url: 'http://www.slop.dev',
   baseUrl: '/',
@@ -41,6 +41,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      metadata: [{name: 'keywords', content: 'extensible, expression, language'}],
       image: 'img/slop-pic.png',
       navbar: {
         title: 'SLOP',

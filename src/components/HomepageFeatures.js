@@ -8,8 +8,8 @@ const FeatureList = [
     Svg: require('../../static/img/Wrench_Icon.svg').default,
     description: (
       <>
-        Deploy code to your project dynamically. Expressions are stored and executed in
-        plain text which can be stored on database records, documents, files or anywhere!
+        Deploy code to your project dynamically. Expressions are stored and executed as
+        plain text which can be stored on database records, documents, objects, files or anywhere!
       </>
     ),
   },
@@ -18,8 +18,8 @@ const FeatureList = [
     Svg: require('../../static/img/rocket.svg').default,
     description: (
       <>
-        Reference and pass Java objects directly in SLOP expressions. Native calls on objects
-        unlock the power of Java and remove the limits of what's possible.
+        Pass and reference objects directly in SLOP expressions. Native calls unlock
+        the power of the underlying language to provide limitless possibilities.
       </>
     ),
   },
@@ -28,8 +28,8 @@ const FeatureList = [
     Svg: require('../../static/img/construction-cone.svg').default,
     description: (
       <>
-        Doesn't have the feature you're looking for? It's very easy to expand the language by
-        writing functions or adding your own literals, operations and statements.
+        Missing the feature you're looking for? Using the in-built grammar system, it's easy to 
+        expand the language by writing your own functions, literals, operations and statements.
       </>
     ),
   },

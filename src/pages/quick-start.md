@@ -45,4 +45,5 @@ This will print the fibonacci sequence up to 12 places:
 Result: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 ```
 ...and that's it! These are simple examples to get you started, but please take a look at the documentation section to 
-discover more of SLOP's features, sample projects and even how to extend it yourself. 
+discover more of SLOP's features, sample projects and even how to extend it yourself. If however you're new to expression 
+languages or have a nagging question running through your head, please check out the [why?](/why) page.

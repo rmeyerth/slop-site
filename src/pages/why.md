@@ -19,22 +19,20 @@ Some of these like the lack of IDE support are genuine, but that's not to say it
 with most things is finding the time to do it. It is on the roadmap and depending on how the initial release goes, it will 
 be prioritised accordingly.
 
-As for type safety, let me start by saying SLOP is very type safe. When values are read from an expression, they 
-are assigned to an typed literal token class. If a value is defined as one type but does not match the format, an error is 
-thrown. Type operations (whilst configurable) must adhere to the specified types or the Parser will throw an exception.
-(see [Type Operations](/docs/Extending/type-operations) for more information). As one final comment, it is written in 
-Java and makes use of all the underlying type safety and restrictions whether writing code natively or through an expression 
-in SLOP.
+As for type safety, SLOP adheres to the same ruleset as the underlying language (Java). When values are read from an expression 
+they are assigned to an typed literal token class. If a value is defined as one type but is not in the expected format, an error 
+is thrown. Likewise type operations (whilst configurable) must also adhere to the specified types that are compatible or be 
+rejected by the Parser. (see [Type Operations](/docs/Extending/type-operations) for more information). 
 
-Finally the third point, why would you choose this over writing actual code? Typically when writing a back-end API's or applications, 
+On the last point, why would you choose this over writing actual code? Typically when writing back-end API's or applications, 
 you add functionality to handle the predicted use model. For example, take a bank where customers accounts are being managed. You 
 can write code to handle common things like payments, transfers, account information etc. All of these are well defined but 
 what about something a bit more open-ended like notifications? Say for example the customer wants to be informed when their account 
 goes below a certain threshold. Most banks can support this, but what happens when a customer wants to be notified if they have 
 less than 250 in the bank prior to the 11th of every month when they pay their energy bill? A system can be written to handle 
-most scenarios, but as the coverage increases so too does the complexity.
+most scenarios, but as coverage increases so too does the complexity.
 
 This is where expression languages come in so that you don't have to try and predict what to handle. Code can be written on-the-fly 
-to handle any scenario if provided the necessary context and can work instantly. Now keep in mind that this is just one example, 
+to handle any scenario that arises if provided the necessary context and can run instantly. Keep in mind that this is just one example, 
 but by opening up your system to dynamic configuration you could start to remove the shackles of constant code deployments / hotfixes.
 For more examples of how this can be used, please see the [Sample Projects](/docs/Sample%20Projects/example-projects) section.
