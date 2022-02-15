@@ -22,7 +22,7 @@ be prioritised accordingly.
 As for type safety, let me start by saying SLOP is very type safe. When values are read from an expression, they 
 are assigned to an typed literal token class. If a value is defined as one type but does not match the format, an error is 
 thrown. Type operations (whilst configurable) must adhere to the specified types or the Parser will throw an exception.
-(see [Type Operations](/docs/Extending/type-operations.md) for more information). As one final comment, it is written in 
+(see [Type Operations](/docs/Extending/type-operations) for more information). As one final comment, it is written in 
 Java and makes use of all the underlying type safety and restrictions whether writing code natively or through an expression 
 in SLOP.
 
