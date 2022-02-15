@@ -41,6 +41,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      image: 'img/slop-pic.png',
       navbar: {
         title: 'SLOP',
         logo: {
@@ -50,6 +51,7 @@ const config = {
         items: [
           {to: '/blog', label: 'News', position: 'left'},
           {to: '/quick-start', label: 'Quick Start', position: 'left'},
+          {to: '/why', label: 'Why?', position: 'left'},
           {
             type: 'doc',
             docId: 'intro',
