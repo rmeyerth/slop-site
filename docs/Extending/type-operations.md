@@ -8,7 +8,7 @@ You should now be able to define a value using declared syntax and see that type
 you're unsure of how to do this, the best way to do this would be to stick a breakpoint in your IDE in the 
 ``YourType.process(...)`` method. The next stage is to add type operations so that when you use an operator with the 
 new type, an appropriate action occurs and a result returned. For example, say I want to be able to define
-a new map type I would declare a class with the following*:
+a map type I would declare a class with the following*:
 ```java
 @NoArgsConstructor
 public class MapToken extends Token<Map<Token<?>, Token<?>>> {
@@ -80,7 +80,7 @@ public class MapToken extends Token<Map<Token<?>, Token<?>>> {
 }
 ```
 This allows us to now define a Map using ``{Key->Value,Key->Value,...}``. If you enable unsafe operations 
-(See [Configuration Class](#configuration-class)), you can add, remove or fetch values as the core class
+(See [Configuration Class](#configuration-class)), you can add, remove or fetch values as the core object
 is simply a Map and those functions can be performed out of the box e.g.
 ```bash
 > {1->"first",2->"second"}.get(1)
@@ -197,7 +197,7 @@ You can register it in the config under the initTypeOperations() method:
     }
 ```
 The following operations can now be performed:
-```
+```bash
 {1->1,2->2} + {3->3,4->4}
 Result: {1=1, 2=2, 3=3, 4=4} (Time taken: 46ms)
 {1->1,2->2,3->3} - {2->2}
