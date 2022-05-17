@@ -12,7 +12,7 @@ const config = {
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/slop.ico',
   organizationName: 'tronied', // Usually your GitHub org/user name.
   projectName: 'slop', // Usually your repo name.
 
