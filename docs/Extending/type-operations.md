@@ -4,11 +4,10 @@ sidebar_position: 4
 
 # Type Operations
 If you've read the section [Design Approach](#design-approach), you should now know how to add your own types.
-You should now be able to define a value using declared syntax and see that type reflected in its tokenized form. If 
-you're unsure of how to do this, the best way to do this would be to stick a breakpoint in your IDE in the 
-``YourType.process(...)`` method. The next stage is to add type operations so that when you use an operator with the 
-new type, an appropriate action occurs and a result returned. For example, say I want to be able to define
-a map type I would declare a class with the following*:
+You should now be able to type a value using declared syntax and see that reflected in its tokenized form in 
+the ``YourType.process(...)`` method. The next stage is to add type operations so that when you use an operator 
+with the new type, an appropriate action occurs and a result returned. For example, say I've defined a new 
+map type*:
 ```java
 @NoArgsConstructor
 public class MapToken extends Token<Map<Token<?>, Token<?>>> {
@@ -37,31 +36,32 @@ public class MapToken extends Token<Map<Token<?>, Token<?>>> {
 
     @Override
     public List<Token<?>> process(SLOPParser parser, SLOPContext context, SLOPConfig config) {
-        if (Objects.isNull(getValue())) {
-            HashMap<Token<?>, Token<?>> aMap = new HashMap<>();
-            //Unwrap to bare-bones groups and tokens
-            Token<?> mapStructure = getTokenGroups().get(0).unwrapKeepStructure(getTokenGroups().get(0), 1);
-            if (!(mapStructure instanceof TokenGroup)) {
-                throw new ParserException("Expected map to simplify to TokenGroup but got " +
-                        mapStructure.getClass().getSimpleName());
+        Map<Token<?>, Token<?>> aMap = Objects.isNull(getValue()) ? new HashMap<>() : getValue();
+        //Handle blank initializer
+        if (!getTokenGroups().isEmpty()) {
+            Token<?> mapStructure = getTokenGroups().get(0).unwrapKeepStructure(getTokenGroups().get(0));
+            if (mapStructure instanceof TokenGroup) {
+                /* Expect map structure to take form of a TokenGroup with child TokenGroups of Key / Value pairs.
+                 * If this is not the case then wrap the result in another TokenGroup as the unwrap has gone too far */
+                if (((TokenGroup) mapStructure).getTokens().stream().anyMatch(t -> !(t instanceof TokenGroup))) {
+                    mapStructure = new TokenGroup(Collections.singletonList(mapStructure));
+                }
+                ((TokenGroup) mapStructure).getTokens()
+                        .forEach(tg -> {
+                            Token<?> key = ((TokenGroup) tg).getTokens().get(0);
+                            key = parser.processExpression(key instanceof TokenGroup ?
+                                    ((TokenGroup) key).getTokens() : Collections.singletonList(key), context);
+                            Token<?> value = ((TokenGroup) tg).getTokens().get(1);
+                            value = parser.processExpression(value instanceof TokenGroup ?
+                                    ((TokenGroup) value).getTokens() : Collections.singletonList(value), context);
+                            aMap.put(key, value);
+                        });
+            } else {
+                throw new ParserException(String.format("Cannot initialize map with token of type '%s'",
+                        mapStructure.getClass().getSimpleName()));
             }
-            //Iterate through map structure and resolve all contained token values
-            ((TokenGroup) mapStructure).getTokens()
-                    .forEach(tg -> {
-                        if (!(tg instanceof TokenGroup)) {
-                            throw new ParserException("Expected mapping to be TokenGroup but got " +
-                                    tg.getClass().getSimpleName());
-                        }
-                        Token<?> key = ((TokenGroup) tg).getTokens().get(0);
-                        key = parser.processExpression(key instanceof TokenGroup ?
-                                ((TokenGroup)key).getTokens() : Collections.singletonList(key), context);
-                        Token<?> value = ((TokenGroup) tg).getTokens().get(1);
-                        value = parser.processExpression(value instanceof TokenGroup ?
-                                ((TokenGroup)value).getTokens() : Collections.singletonList(value), context);
-                        aMap.put(key, value);
-                    });
-            setValue(aMap);
         }
+        if (Objects.isNull(getValue())) setValue(aMap);
         return Collections.singletonList(this);
     }
 
@@ -79,14 +79,25 @@ public class MapToken extends Token<Map<Token<?>, Token<?>>> {
     }
 }
 ```
+I would then register / declare this in the configuration:
+```java
+    private void initTokenHandlers() {
+        //...
+        
+        //Language literals / supported types
+        //...        
+        tokenHandlers.add(new MapToken());
+        //...
+    }
+```
 This allows us to now define a Map using ``{Key->Value,Key->Value,...}``. If you enable unsafe operations 
-(See [Configuration Class](#configuration-class)), you can add, remove or fetch values as the core object
-is simply a Map and those functions can be performed out of the box e.g.
+(See [Configuration Class](#configuration-class)), you can add, remove or fetch values directly using the
+Map Java class implementation e.g.
 ```bash
 > {1->"first",2->"second"}.get(1)
 Result: "first" (Time taken: 1ms)
 ```
-The maps are not specific on type and can be defined using different types:
+The maps are not type specific and can support anything you throw at it:
 ```bash
 > myVar = {"first"->1,2->"second"}
 > {?myVar}.put("third",3)
@@ -96,16 +107,35 @@ Result: {"first"=1, 2="second", "third"=3} (Time taken: 1ms)
 > {?myVar}
 Result: {"first"=1, 2="second"} (Time taken: 1ms)
 ```
-Type operations can perform the same operations but slightly allow more customization. For example, by creating the
-following MapOperations class:
+Type operation support can be added to allow more ease of use when dealing with the types natively. For example, 
+we can define the following TypeOperation implementation for our Map type:
 ```java
+/**
+ * Handles Map operations including add and subtract with the latter supporting both Map and Lists. The
+ * result is returned as a MapToken.
+ */
 public class MapOperation implements TypeOperation {
-    
+
+    /**
+     * See {@link TypeOperation#canHandle(Token, OperatorToken, Token) canHandle}
+     */
     @Override
     public boolean canHandle(Token<?> first, OperatorToken operator, Token<?> second) {
         return first.is(Map.class) && (second.is(Map.class) || second.is(List.class));
     }
 
+    /**
+     * See {@link TypeOperation#handleCustomOperator(Token, OperatorToken, Token) handleCustomOperator}
+     */
+    @Override
+    public <T> T handleCustomOperator(Token<?> first, OperatorToken operator, Token<?> second) {
+        throw new ParserException(String.format("Unable to handle Map operation with operator '%s'",
+                operator.getValue()));
+    }
+
+    /**
+     * See {@link TypeOperation#process(SLOPConfig, Token, OperatorToken, Token) process}
+     */
     @Override
     @SuppressWarnings("unchecked")
     public Token<?> process(SLOPConfig config, Token<?> first, OperatorToken operator, Token<?> second) {
@@ -127,28 +157,29 @@ public class MapOperation implements TypeOperation {
     private Token<?> handleMapOperations(OperatorHandler handler, Map<Token<?>,Token<?>> original,
                                          Map<Token<?>,Token<?>> compare, OperatorToken operator,
                                          CustomOperation customOp) {
-        Map<Token<?>, Token<?>> result;
+        final Map<Token<?>, Token<?>> result;
         switch (handler.getOpType(operator)) {
             /* Adds two maps together e.g. {1:1,2:2} + {3:3,4:4} = {1:1,2:2,3:3,4:4}. Note that if there is a key
              * which already exists in the left-side map then it will be overwritten by that on the right e.g.
              * {1:1,2:2} + {1:2,3:3} = {1:2,2:2,3:3} */
             case ADD:
-                original.putAll(compare);
-                result = original;
+                result = new HashMap<>(original);
+                result.putAll(compare);
                 break;
             /* Subtracts a map from the other e.g. [1:1,2:2,3:3] - [2:2,3:3] = [1:1]. Please note items are only removed
              * if their key and values match. There if you did [1:1] - [1:3], you'd still result in the original [1:1] */
             case SUBTRACT:
+                result = new HashMap<>(original);
                 List<Token<?>> keysToRemove = original.keySet().stream()
                         .filter(compare.keySet()::contains)
                         .collect(Collectors.toList());
+
                 keysToRemove.forEach(kr -> {
                     //Only remove those with matching values too
-                    if (original.get(kr).equalsValue(compare.get(kr))) {
-                        original.remove(kr);
+                    if (result.get(kr).equalsValue(compare.get(kr))) {
+                        result.remove(kr);
                     }
                 });
-                result = original;
                 break;
             default: result = (Map<Token<?>, Token<?>>) customOp.handleCustomOp();
         }
@@ -173,30 +204,26 @@ public class MapOperation implements TypeOperation {
         return new MapToken(result);
     }
 
-    @Override
-    public <T> T handleCustomOperator(Token<?> first, OperatorToken operator, Token<?> second) {
-        throw new ParserException(String.format("Unable to handle Map operation with operator '%s'",
-                operator.getValue()));
-    }
-
     /**
-     * Cuts down on the amount of parameters needing to be passed to each operation handler method
+     * A simple functional interface to avoid having to pass multiple parameters to perform the same
+     * call for both right-side Map and Lists if the default case is triggered.
      */
     @FunctionalInterface
     private interface CustomOperation {
         Token<?> handleCustomOp();
     }
 }
-
 ```
-You can register it in the config under the initTypeOperations() method:
+Although this looks quite complicated, all we're doing is adding support for it to handle only a left-side map and
+the option or either a map or list on the right-side. Operations can then be added such as add and subtract. This 
+class can then be registered in the config under the initTypeOperations() method:
 ```java
     private void initTypeOperations() {
         //...
         typeOperations.add(new MapOperation());
     }
 ```
-The following operations can now be performed:
+The following can now be performed:
 ```bash
 {1->1,2->2} + {3->3,4->4}
 Result: {1=1, 2=2, 3=3, 4=4} (Time taken: 46ms)
