@@ -2,12 +2,39 @@
 sidebar_position: 4
 ---
 
-# Type Operations
-If you've read the section [Design Approach](#design-approach), you should now know how to add your own types.
-You should now be able to type a value using declared syntax and see that reflected in its tokenized form in 
-the ``YourType.process(...)`` method. The next stage is to add type operations so that when you use an operator 
-with the new type, an appropriate action occurs and a result returned. For example, say I've defined a new 
-map type*:
+# Adding Types / Operations
+As can be seen in the [Design Approach](#design-approach) section, types can be defined using regular 
+expressions or grammar. If the type you are wanting is simple and represents a primitive type or object 
+then regular expressions would be best. However, if you are wanting to customise how your type is defined 
+or interact with other types then use grammar.
+
+Take the original example which is a simple long type. We can see by the regular expression ``(^(-?[0-9]+)L)``
+that a long can be defined either positive or negative so long as a number is followed by an 'L' character.
+So far so simple, however things get more complicated when it comes to collections. Let's say we wanted to define a
+Map type where one or more key / value pairs are separated by '->' syntax and surrounded by curly braces. We
+could define this by using the following ``{((.+?)->(.+?),?)+}``, however say we have ``{1->1,2->2 + 2,3->3}`` 
+in an expression, because we've got multiple embedded groups we run into issues with them either not knowing
+when to stop (overly greedy) or not being greedy enough due to the syntax.
+
+This is where defining the pattern with grammar is useful as it is designed to handle complex structures. It
+also allows better handling of individual tokens in simplistic form. Let's use the Map as an example and now
+use ``'{' ( ( val '->' expr ','? ) )+ '}'``. This can be broken down to the following:
+
+| Grammar | Description |
+|:-----|:--------|
+| '{' | Starting syntax curly brace |
+| ( | Capture group start |
+| ( | Capture group start (Multiple embedded grammar groups used for collection element separation) |
+| val | Single capture token (Key must be defined as a single value and cannot be the result of an operation) |
+| '->' | Syntax key / value pair separator |
+| expr | Multiple token capture group (could be the result of an operation e.g. 1 + 1) |
+| ',' | A syntax comma separating key / value pairs |
+| ? | Makes the preceding tag (comma) optional as a map could be defined as a single key / value e.g. {1->1} |
+| ) | Closing capture group |
+| ) | Closing capture group (Each capture group gets mapped to a TokenGroup handled by the ``process`` method) |
+| + | Signifies that there could be one or more of the preceding group (in this case key / value pairs) |
+| '}' | Closing syntax curly brace |
+Now that we have our pattern defined we can fill out the rest of the class definition:
 ```java
 @NoArgsConstructor
 public class MapToken extends Token<Map<Token<?>, Token<?>>> {
@@ -31,6 +58,7 @@ public class MapToken extends Token<Map<Token<?>, Token<?>>> {
 
     @Override
     public String getPattern() {
+        //One or more key / value pairs separated by '->' and wrapped in curly braces e.g. {1->1,2->2}
         return "'{' ( ( val '->' expr ','? ) )+ '}'";
     }
 

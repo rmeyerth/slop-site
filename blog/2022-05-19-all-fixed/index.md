@@ -1,6 +1,6 @@
 ---
-slug: all fixed
-title: All Fixed
+slug: 1.2 Release
+title: 1.2 Release
 authors: [tronied]
 tags: [slop]
 ---

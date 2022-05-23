@@ -19,7 +19,7 @@ public class LongToken extends Token<Long> {
 
     @Override
     public String getPattern() {
-        return "^([0-9]+)L";
+        return "^(-?[0-9]+)L";
     }
 
     @Override
