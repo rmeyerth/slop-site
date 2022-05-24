@@ -4,21 +4,21 @@ sidebar_position: 3
 
 # Adding Types / Operations
 As can be seen in the [Design Approach](#design-approach) section, types can be defined using regular 
-expressions or grammar. If the type you are wanting is simple and represents a primitive type or object 
+expressions or grammar. If the type you are writing is simple and represents a primitive type or object 
 then regular expressions would be best. However, if you are wanting to customise how your type is defined 
 or interact with other types then use grammar.
 
 Take the original example which is a simple long type. We can see by the regular expression ``(^(-?[0-9]+)L)``
-that a long can be defined either positive or negative so long as a number is followed by an 'L' character.
+that a long can be defined as either positive or negative if the number itself is followed by an 'L' character.
 So far so simple, however things get more complicated when it comes to collections. Let's say we wanted to define a
 Map type where one or more key / value pairs are separated by '->' syntax and surrounded by curly braces. We
-could define this by using the following ``{((.+?)->(.+?),?)+}``, however say we have ``{1->1,2->2 + 2,3->3}`` 
+could define this by using the following ``{((.+?)->(.+?),?)+}``. However say we have ``{1->1,2->2 + 2,3->3}`` 
 in an expression, because we've got multiple embedded groups we run into issues with them either not knowing
 when to stop (overly greedy) or not being greedy enough due to the syntax.
 
 This is where defining the pattern with grammar is useful as it is designed to handle complex structures. It
-also allows better handling of individual tokens in simplistic form. Let's use the Map as an example and now
-use ``'{' ( ( val '->' expr ','? ) )+ '}'``. This can be broken down to the following:
+also allows better handling of individual tokens in simplistic form. Let's use the Map as an example which can
+be defined as the following ``'{' ( ( val '->' expr ','? ) )+ '}'``. This can be broken down:
 
 ```
 '{'   = Starting syntax curly brace
@@ -49,9 +49,9 @@ a matching Token. In the case where there is no clear choice an exception is thr
 3. Once the matching Token has been identified, a new instance of it is created by calling the ``createToken(String value)``
 method. This creates a new version of the Token and clones all the pattern tokens and settings from the match.
 4. During the lexing phase, the matched Token will be added to the top of the stack so that if it was declared within
-the body of another token or has itself other tokens declared in the body, these can easily be managed. Each
+the body of another token or has itself other tokens declared in its body, these can easily be managed. Each
 Token keeps track of its position with new items being added to the stack at that position until they are deemed 
-complete and added as a child token of the new stack head.
+complete and added as a child token to the new stack head.
 5. As more tokens / syntax are read from the expression, the position of the matched token is progressed accordingly 
 and tokens are added to Token Groups matching the position in which they're added (see ``MyToken.getTokenGroups()``).
 6. Once the lexing phase is complete, the hierarchical list of tokens is sent to the Parser for resolution. Each
@@ -94,10 +94,10 @@ at the ``process`` method we can see an initial check is made to ensure that the
 exception is thrown. This is part of the role of the Parser with each Token responsible for validating its content. If we 
 match up the token groups against the capture groups defined in the grammar string, we get the following:
 ```
-TokenGroups Collection:
-    0 = Condition
-    1 = True Result
-    2 = False Result
+getTokenGroups() Collection:
+    [0] Condition
+    [1] True Result
+    [2] False Result
 ```
 The first task will then be to resolve the value of the conditional part which is found at position 0 of the token groups:
 ```java
@@ -106,8 +106,8 @@ The first task will then be to resolve the value of the conditional part which i
 ```
 As mentioned before, the tokens are passed back to the Parser for resolution as each token will be responsible for resolving
 its own value. The parser also handles the type operations in any expression e.g. A + B. Once a result has been returned from
-the parser it is assigned to a new token called ``conditionResult``. Tokens are stateless by default and so we have to check 
-it conforms to the type we are wanting, which in the case of a condition is a Boolean. If not we throw an exception:
+the parser, in this case it is assigned to a new token called ``conditionResult``. Tokens are stateless by default and so we 
+have to check it conforms to the type we are wanting, which in the case of a condition is a Boolean. If not we throw an exception:
 ```java
     //If the condition is not a Boolean then throw an error i.e. "1 + 2 ? 3 : 4"
     if (!(conditionResult instanceof BooleanToken)) {
@@ -123,8 +123,10 @@ Finally we can evaluate our condition and resolve the associate set of tokens an
             parser.processExpression(getTokenGroups().get(2).getFlatTokens(), context));
 ```
 
-Getting back to our Map type then, although it is a bit more complicated it uses the same principles. We verify the data
-and perform certain actions against a set of tokens or resolve their values:
+Getting back to our Map type, although it is a bit more complicated it uses the same principles. We verify the data
+and perform certain actions against a set of tokens or resolve their values. In this case there is no behaviour as it
+is simply there to store data, so the majority of the ``process`` method is there to resolve and translate those values
+to a native map:
 ```java
 @NoArgsConstructor
 public class MapToken extends Token<Map<Token<?>, Token<?>>> {
