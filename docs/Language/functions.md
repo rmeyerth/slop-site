@@ -47,11 +47,11 @@ public class RandomOp implements Function {
     }
 }
 ```
-Functions are simple from a code standpoint as it simply requires implementing the Function interface and methods.
-The above function will provide the ability to create random numbers using a type parameter. It is important when
-creating functions to check and throw errors if the parameter list is not provided or in the expected format. The
-code itself is fairly self-explanatory and will allow it to be called by using the RAND name and two parameters
-(the second being restricted on the type). Next we need to add it to our config:
+Functions are simple from a code standpoint as it requires only to implement the Function interface and methods.
+The above will provide the ability to create random numbers using a type parameter to be used in an expression. 
+It is important when creating functions to check and throw errors if the parameter list is not in the expected 
+format. The code itself is fairly self-explanatory and will allow it to be called by using the RAND name and two 
+parameters (the second being restricted on the type). Next we need to add it to our config:
 ```java
 SLOPConfig config = new SLOPConfig();
 config.addFunction(new RandomOp());
@@ -76,11 +76,17 @@ Result: 0.5708346 (Time taken: 2ms)
 > RAND("long")
 Result: -7999691372481956837 (Time taken: 1ms)
 ```
+Functions can then be used in conjunction with other values to trigger an action or resolve a value:
+```
+> 3.1459 * RAND("float")
+Result: 0.20246804
+```
 Although this is just an example, it shows that we can leverage the underlying native language to fulfill either
 shortfalls in what is possible with the included literals and statements or to avoid overly complex expressions. 
-Functions can be used for anything and as an example could be used to make a REST call. Using Spring Boot for 
-example we could pass an autowired adapter class into the function constructor. The functions process method 
-could then use the parameters to make one or more calls based on the criteria in the expression String held on 
-a database. For example if in a bank a custom wanted them to notify him if his balance is lower than a certain
-figure and there are more than 10 days left in a certain month, the expression which could be located on the
-customers database record could trigger an event to handle this.
+Imagine a banking application where we have customers stored on a database. We could setup a custom notification 
+stored on a record that is associated with a specific customer which is triggered each day or whenever a change 
+is made to their account. The following will notify them if their main account falls below £250 and it's still 
+less than or equal to the 15th of each month:
+```
+customer.mainAccount.total < 250.00 and DAY("LTE", 15) ? EMAIL_WARNING(customer) : null
+```

@@ -15,6 +15,7 @@ Literals are fixed values but can represent different types. The default set of 
 | Null | N/A | null | Used where a result can be compared to the lack of any value |
 | String | "..." | "This is a string" | A text value |
 | Array | [ ... , ... ] | [1,2,3,4,5] | A collection which stores any values e.g. [1,true,3.5F] |
+| Map | { ... , ... } | {"pi"->3.14,"planck"->6.62} | A map containing key / value pairs |
 
 As they have fixed values they cannot be changed, however they can be used in type operations to create new literals.
 For example, adding the following two literals results in the creation of a new literal:
