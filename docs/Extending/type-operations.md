@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 ---
 
 # Adding Types / Operations
@@ -20,21 +20,111 @@ This is where defining the pattern with grammar is useful as it is designed to h
 also allows better handling of individual tokens in simplistic form. Let's use the Map as an example and now
 use ``'{' ( ( val '->' expr ','? ) )+ '}'``. This can be broken down to the following:
 
-| Grammar | Description |
-|:-----|:--------|
-| '{' | Starting syntax curly brace |
-| ( | Capture group start |
-| ( | Capture group start (Multiple embedded grammar groups used for collection element separation) |
-| val | Single capture token (Key must be defined as a single value and cannot be the result of an operation) |
-| '->' | Syntax key / value pair separator |
-| expr | Multiple token capture group (could be the result of an operation e.g. 1 + 1) |
-| ',' | A syntax comma separating key / value pairs |
-| ? | Makes the preceding tag (comma) optional as a map could be defined as a single key / value e.g. {1->1} |
-| ) | Closing capture group |
-| ) | Closing capture group (Each capture group gets mapped to a TokenGroup handled by the ``process`` method) |
-| + | Signifies that there could be one or more of the preceding group (in this case key / value pairs) |
-| '}' | Closing syntax curly brace |
-Now that we have our pattern defined we can fill out the rest of the class definition:
+```
+'{'   = Starting syntax curly brace
+(     = Capture group start
+(     = Capture group start (Multiple embedded grammar groups used for collection element separation)
+val   = Single capture token (Key must be defined as a single value and cannot be the result of an 
+        operation)
+'->'  = Syntax key / value pair separator
+expr  = Multiple token capture group (could be the result of an operation e.g. 1 + 1)
+','   = A syntax comma separating key / value pairs
+?     = Makes the preceding tag (comma) optional as a map could be defined as a single key / value 
+        e.g. {1->1}
+)     = Closing capture group
+)     = Closing capture group (Each capture group gets mapped to a TokenGroup handled by the 
+        ``process`` method)
++     = Signifies that there could be one or more of the preceding group (in this case key / value 
+        pairs)
+'}'   = Closing syntax curly brace
+```
+
+It is important to understand when and where methods within a Token get called: 
+1. Pattern tokens are initially generated and stored against all token types registered in the configuration class. 
+Depending on the pattern type (``getPatternType`` method) this determines whether these are created by the Grammar 
+Lexer or deferred to the regex matchers during the Expression String lexing stage.
+2. As each literal value is read from the Expression String, matches may occur against registered Token classes and 
+their pattern tokens. If two or more matches are found then it looks ahead in the expression to make a best-guess at 
+a matching Token. In the case where there is no clear choice an exception is thrown.
+3. Once the matching Token has been identified, a new instance of it is created by calling the ``createToken(String value)``
+method. This creates a new version of the Token and clones all the pattern tokens and settings from the match.
+4. During the lexing phase, the matched Token will be added to the top of the stack so that if it was declared within
+the body of another token or has itself other tokens declared in the body, these can easily be managed. Each
+Token keeps track of its position with new items being added to the stack at that position until they are deemed 
+complete and added as a child token of the new stack head.
+5. As more tokens / syntax are read from the expression, the position of the matched token is progressed accordingly 
+and tokens are added to Token Groups matching the position in which they're added (see ``MyToken.getTokenGroups()``).
+6. Once the lexing phase is complete, the hierarchical list of tokens is sent to the Parser for resolution. Each
+Token is responsible for resolving its own result in tandem with the Parser when its ``process()`` method is called.
+Child tokens (located in the token groups) can then be used to affect behaviour or resolve values. 
+
+Let's take the simple conditional statement as an example and perform a breakdown:
+```java
+//...
+@Override
+public String getPattern() {
+    //condition ? trueResult : falseResult
+    return "expr '?' expr ':' expr";
+}
+
+@Override
+public List<Token<?>> process(SLOPParser parser, SLOPContext context, SLOPConfig config) {
+    //Expect that there are 3 tokens groups representing the condition and true / false token groups
+    if (getTokenGroups().size() < 3) {
+        throw new ParserException(String.format("Condition does not have required arguments to execute. Expecting " +
+                "condition (%s), trueResult (%s) and falseResult (%s)", getTokenGroups().get(0), getTokenGroups().get(1),
+                getTokenGroups().get(2)));
+    }
+    //Evaluate the condition using the tokens found in the first token group
+    Token<?> conditionResult = parser.processExpression(getTokenGroups().get(0).getTokens(), context);
+    //If the condition is not a Boolean then throw an error i.e. "1 + 2 ? 3 : 4"
+    if (!(conditionResult instanceof BooleanToken)) {
+        throw new ParserException(String.format("Expected a boolean result from condition '%s'. Possible invalid " +
+                        "condition specified", getTokenGroups().get(0)));
+    }
+    //Execute the relevant set of tokens based on the condition result
+    return Collections.singletonList((((BooleanToken) conditionResult).getValue()) ?
+            parser.processExpression(getTokenGroups().get(1).getFlatTokens(), context) :
+            parser.processExpression(getTokenGroups().get(2).getFlatTokens(), context));
+}
+//...
+```
+The pattern is very simple consisting of 3 expressions (one or more tokens) with the condition and two possible results. Looking
+at the ``process`` method we can see an initial check is made to ensure that there are 3 defined token groups, otherwise an 
+exception is thrown. This is part of the role of the Parser with each Token responsible for validating its content. If we 
+match up the token groups against the capture groups defined in the grammar string, we get the following:
+```
+TokenGroups Collection:
+    0 = Condition
+    1 = True Result
+    2 = False Result
+```
+The first task will then be to resolve the value of the conditional part which is found at position 0 of the token groups:
+```java
+    //Evaluate the condition using the tokens found in the first token group
+    Token<?> conditionResult = parser.processExpression(getTokenGroups().get(0).getTokens(), context);
+```
+As mentioned before, the tokens are passed back to the Parser for resolution as each token will be responsible for resolving
+its own value. The parser also handles the type operations in any expression e.g. A + B. Once a result has been returned from
+the parser it is assigned to a new token called ``conditionResult``. Tokens are stateless by default and so we have to check 
+it conforms to the type we are wanting, which in the case of a condition is a Boolean. If not we throw an exception:
+```java
+    //If the condition is not a Boolean then throw an error i.e. "1 + 2 ? 3 : 4"
+    if (!(conditionResult instanceof BooleanToken)) {
+        throw new ParserException(String.format("Expected a boolean result from condition '%s'. Possible invalid " +
+                        "condition specified", getTokenGroups().get(0)));
+    }
+```
+Finally we can evaluate our condition and resolve the associate set of tokens and return the result:
+```java
+    //Execute the relevant set of tokens based on the condition result
+    return Collections.singletonList((((BooleanToken) conditionResult).getValue()) ?
+            parser.processExpression(getTokenGroups().get(1).getFlatTokens(), context) :
+            parser.processExpression(getTokenGroups().get(2).getFlatTokens(), context));
+```
+
+Getting back to our Map type then, although it is a bit more complicated it uses the same principles. We verify the data
+and perform certain actions against a set of tokens or resolve their values:
 ```java
 @NoArgsConstructor
 public class MapToken extends Token<Map<Token<?>, Token<?>>> {
@@ -67,6 +157,7 @@ public class MapToken extends Token<Map<Token<?>, Token<?>>> {
         Map<Token<?>, Token<?>> aMap = Objects.isNull(getValue()) ? new HashMap<>() : getValue();
         //Handle blank initializer
         if (!getTokenGroups().isEmpty()) {
+            //Scan the resulting token groups and unwrap as much as possible to make handling easier
             Token<?> mapStructure = getTokenGroups().get(0).unwrapKeepStructure(getTokenGroups().get(0));
             if (mapStructure instanceof TokenGroup) {
                 /* Expect map structure to take form of a TokenGroup with child TokenGroups of Key / Value pairs.
@@ -76,12 +167,14 @@ public class MapToken extends Token<Map<Token<?>, Token<?>>> {
                 }
                 ((TokenGroup) mapStructure).getTokens()
                         .forEach(tg -> {
+                            //Although the key is restricted to a single token, resolve it anyway as it could need resolving
                             Token<?> key = ((TokenGroup) tg).getTokens().get(0);
                             key = parser.processExpression(key instanceof TokenGroup ?
                                     ((TokenGroup) key).getTokens() : Collections.singletonList(key), context);
                             Token<?> value = ((TokenGroup) tg).getTokens().get(1);
                             value = parser.processExpression(value instanceof TokenGroup ?
                                     ((TokenGroup) value).getTokens() : Collections.singletonList(value), context);
+                            //Add the resolved values to resulting map
                             aMap.put(key, value);
                         });
             } else {
@@ -107,7 +200,8 @@ public class MapToken extends Token<Map<Token<?>, Token<?>>> {
     }
 }
 ```
-I would then register / declare this in the configuration:
+To register / declare the type in the configuration, simply create a new instance and add to the tokenHandler collection
+in the configuration class:
 ```java
     private void initTokenHandlers() {
         //...
@@ -135,8 +229,9 @@ Result: {"first"=1, 2="second", "third"=3} (Time taken: 1ms)
 > {?myVar}
 Result: {"first"=1, 2="second"} (Time taken: 1ms)
 ```
-Type operation support can be added to allow more ease of use when dealing with the types natively. For example, 
-we can define the following TypeOperation implementation for our Map type:
+## Type Operations
+Operation support can be added for your type to allow more ease of use when dealing with the types natively. 
+For example, we can define the following TypeOperation implementation for our new Map type:
 ```java
 /**
  * Handles Map operations including add and subtract with the latter supporting both Map and Lists. The
@@ -242,29 +337,94 @@ public class MapOperation implements TypeOperation {
     }
 }
 ```
-Although this looks quite complicated, all we're doing is adding support for it to handle only a left-side map and
-the option or either a map or list on the right-side. Operations can then be added such as add and subtract. This 
-class can then be registered in the config under the initTypeOperations() method:
+Although this looks quite complicated, let's start by breaking each stage down and explaining what each part does.
+As the parser processes the tokens, it looks for certain patterns like that of two Tokens surrounding an OperatorToken.
+In this scenario, it will fetch all of the declared TypeOperation classes and search for a match using the ``canHandle`` 
+method by passing it all the tokens involved in the operation. In the case of our MapOperation class, we are doing the 
+following:
+```java
+@Override
+public boolean canHandle(Token<?> first, OperatorToken operator, Token<?> second) {
+    return first.is(Map.class) && (second.is(Map.class) || second.is(List.class));
+}
+```
+In this case we're declaring that we only support a map type on the left-side but both a map or list on the right-side. 
+If it found that the types do match then a call to the ``process`` method is made:
+```java
+@Override
+@SuppressWarnings("unchecked")
+public Token<?> process(SLOPConfig config, Token<?> first, OperatorToken operator, Token<?> second) {
+    OperatorHandler handler = config.getOperatorHandler();
+    //We can suppress warnings here as we've already checked the contained token
+    Map<Token<?>,Token<?>> original = first.getValue(Map.class);
+    if (second.is(Map.class)) {
+        Map<Token<?>,Token<?>> compare = second.getValue(Map.class);
+        return handleMapOperations(handler, original, compare, operator,
+                () -> handleCustomOperator(first, operator, second));
+    } else {
+        List<Token<?>> compare = second.getValue(List.class);
+        return handleListOperations(handler, original, compare, operator,
+                () -> handleCustomOperator(first, operator, second));
+    }
+}
+```
+In the above case we're first fetching the OperatorHandler class from the config. This allows us to compare the passed 
+operator against the registered ones we have and perform an easy (and readable) switch statement to handle each. In
+this case since we have to handle both right-side list and map types, we first check and call a different method to
+handle each (``handleMapOperations`` and ``handleListOperations``). We are also passing in a method reference to
+handle any unsupported operators that we encounter. In this case though we are just throwing an exception if that 
+occurs in the ``handleCustomOperator()`` method.
+
+Let's take a look at the ``handleListOperations`` method for simplicity:
+```java
+@SuppressWarnings("unchecked")
+private Token<?> handleListOperations(OperatorHandler handler, Map<Token<?>,Token<?>> original,
+                                        List<Token<?>> compare, OperatorToken operator,
+                                        CustomOperation customOp) {
+    Map<Token<?>, Token<?>> result;
+    if (handler.getOpType(operator) == OperatorType.SUBTRACT) {
+        /* Subtracts the matching keys present in the right-side list from the left-side map */
+        List<Token<?>> keysToRemove = original.keySet().stream()
+                .filter(compare::contains)
+                .collect(Collectors.toList());
+        keysToRemove.forEach(original::remove);
+        result = original;
+    } else {
+        result = (Map<Token<?>, Token<?>>) customOp.handleCustomOp();
+    }
+    return new MapToken(result);
+}
+```
+In this case we are only supporting subtraction using an array as it we can use the key values found in an array
+to remove those from the Map. We simply loop through the key values filtering to only those which match the keys
+and then remove them from the resulting Map. Regarding operations, it is up to the choice of the developer as to
+whether the original Map is updated but in this case we leave the state of the original Map alone and return a 
+new Map containing the result. If we wanted to reflect those changes back to the original map we would do:
+```bash
+> myMap = {1->1,2->2,3->3}
+> {?myMap}
+Result: {1->1,2->2,3->3}
+> {?myMap} = {?myMap} - [2]
+> {?myMap}
+Result: {1->1,3->3}
+```
+
+This operations class can then be registered in the config under the initTypeOperations() method:
 ```java
     private void initTypeOperations() {
         //...
         typeOperations.add(new MapOperation());
     }
 ```
-The following can now be performed:
+With those registered, in addition to the above example we can now perform the following:
 ```bash
-{1->1,2->2} + {3->3,4->4}
-Result: {1=1, 2=2, 3=3, 4=4} (Time taken: 46ms)
-{1->1,2->2,3->3} - {2->2}
-Result: {1=1, 3=3} (Time taken: 14ms)
-{1->1,2->2,3->3,4->4} - [1,3]
-Result: {2=2, 4=4} (Time taken: 12ms)
+> {1->1,2->2} + {3->3,4->4}
+Result: {1=1, 2=2, 3=3, 4=4}
+> {1->1,2->2,3->3} - {2->2}
+Result: {1=1, 3=3}
 ```
-To explain this, the ``canHandle`` method in the TypeOperation interface determines which types the operations class can 
-handle from the Parser. For most types this would be restricted to the same type. However, it provides the flexibility 
-to control extra types to provide more functionality or for ease of use. In the above case the MapOperations class 
-will trigger if the first token is a Map but the second could be either a Map or List. This is purely because whilst 
-the ``+`` operation is handy for adding elements to a Map, the ``-`` is a bit overkill to specify both a key and value 
-to remove the entry. As such, we can utilise the List to represent the keys to simplify things.
+In the above example the addition of the List containing keys is there to simplify the removal process. Otherwise by
+performing a subtraction using two maps you would have to match both key and value. It is good to keep in mind what
+would be useful to make writing expressions simple and as concise as possible.
 
 *NOTE: This code is now included as part of the core SLOP functionality.
