@@ -35,4 +35,3 @@ most scenarios, but as coverage increases so too does the complexity.
 This is where expression languages come in so that you don't have to try and predict what to handle. Code can be written on-the-fly 
 to handle any scenario that arises if provided the necessary context and can run instantly. Keep in mind that this is just one example, 
 but by opening up your system to dynamic configuration you could start to remove the shackles of constant code deployments / hotfixes.
-For more examples of how this can be used, please see the [Sample Projects](/docs/Sample%20Projects/example-projects) section.
