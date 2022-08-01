@@ -40,7 +40,7 @@ This will print the fibonacci sequence up to 12 places:
 ```bash
 Result: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 ```
-...and that's it! If you'd like to see a detailed breakdown of this expression, please see the [Variables](/docs/Language/Statements/variables#fibonacci-example-breakdown) section. 
+...and that's it! If you'd like to see a detailed breakdown of this expression, please look [here](/docs/Language/Statements/variables#fibonacci-example-breakdown). 
 
 These are a couple of simple examples to get you started, but please take a look at the documentation section to 
 discover more of SLOP's features, sample projects and even how to extend it yourself. If however you're new to expression 
