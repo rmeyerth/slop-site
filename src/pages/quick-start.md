@@ -29,11 +29,11 @@ Result: 8
 Alternatively for something a bit more ambitious:
 ```java
 public static void main(String[] args) {
-    List<?> result = SLOPProcessor.processStatic(
-        "[first = 0,second = 1] + repeat(i++,0,<10) result = {?first} + {?second}; first = {?second}; second = {?result};", 
-            context).getValue(List.class);
+    List<Integer> result = SLOPProcessor.processStatic(
+        "[first = 0,second = 1] + repeat(i++,0,<10) result = {?first} + {?second}; first = {?second}; second = {?result};")
+                .getValue(List.class);
     System.out.println(String.format("Result: [%s]",
-            result.stream().map(Object::toString).collect(Collectors.joining(", "))));
+        result.stream().map(Object::toString).collect(Collectors.joining(", "))));
 }
 ```
 This will print the fibonacci sequence up to 12 places:
