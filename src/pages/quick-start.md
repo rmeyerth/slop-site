@@ -29,12 +29,8 @@ Result: 8
 Alternatively for something a bit more ambitious:
 ```java
 public static void main(String[] args) {
-    SLOPProcessor processor = new SLOPProcessor();
-    SLOPContext context = new SLOPContext();
-    context.set("first", 0);
-    context.set("second", 1);
-    List<?> result = processor.process(
-        "[0,1] + repeat(i++,0,<10) result = {?first} + {?second}; first = {?second}; second = {?result};", 
+    List<?> result = SLOPProcessor.processStatic(
+        "[first = 0,second = 1] + repeat(i++,0,<10) result = {?first} + {?second}; first = {?second}; second = {?result};", 
             context).getValue(List.class);
     System.out.println(String.format("Result: [%s]",
             result.stream().map(Object::toString).collect(Collectors.joining(", "))));
