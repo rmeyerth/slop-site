@@ -10,9 +10,22 @@
   overflow: hidden;
 }
 
+.deheroBanner {
+  padding: 20px 0 0 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  height: 40px;
+  background-color: #d99e00;
+  vertical-align: center;
+}
+
 @media screen and (max-width: 966px) {
   .heroBanner {
     padding: 2rem;
+  }
+  .deheroBanner {
+    padding: 0rem;
   }
 }
 

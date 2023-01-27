@@ -15,12 +15,12 @@ SLOP includes five main components:
 The processor class is the starting point for anyone wishing to use or configure SLOP. It can evaluate static expressions by
  using:
 ```java
-SLOPProcessor.processStatic("3 > 4 ? \"no\" : \"yes\"").getValue(String.class);
+SLOPProcessor.processStatic("3 > 4 ? 'no' : 'yes'").getValue(String.class);
 ```
 or by creating an instance and calling the process method:
 ```java
 SLOPProcessor processor = new SLOPProcessor();
-processor.process("3 > 4 ? \"no\" : \"yes\"").getValue(String.class);
+processor.process("3 > 4 ? 'no' : 'yes'").getValue(String.class);
 ```
 Each accepts a context object and each has its own advantages over the other. The static version is quick to call 
 without the need to create an instance. It is meant for fast lightweight evaluation of expressions, though this 
@@ -66,7 +66,7 @@ There are some general properties which have been defined in a DefaultProperties
 ```
 As a quick run through of each:
 - The date format determines the default format used when using the DATE function e.g. dd-MM-yyyy
-- Determines which character can be used as an escape character e.g. "Test String \\"Inner String\\"". In this case 
+- Determines which character can be used as an escape character e.g. "Test String \"Inner String\"". In this case 
 it's using the backslash character.
 - The keyword used as an OR operator. This is a legacy entry and would recommend looking to the LogicOperator class instead.
 - Debug mode enables all debug messages to see how values were derived.
@@ -75,7 +75,7 @@ it's using the backslash character.
   SLOPConfig config = new SLOPConfig();
   config.setProperty(DefaultProperties.SAFE_OPERATIONS, false)
   SLOPProcessor processor = new SLOPProcessor(config);
-  processor.process("\"testing\".substring(1,4).concat(\"run\")"); //Results in "testrun"
+  processor.process("'testing'.substring(1,4).concat('run')"); //Results in "testrun"
   ```
   Using the above example, attempting a native call without setting that property will throw a ParserException.
 
@@ -169,11 +169,11 @@ Result: 32250000
 Using another example with the employee collection, let's say we wanted to extract each name into a collection. 
 In most languages you would iterate through each object adding the relevant field. This would be similar to the following:
 ```bash
-repeat(index++;0;<acme.employees.size()) result = acme.employees[{?index}].name;
+repeat(index++;0;<acme.employees.size()) result = acme.employees[index].name;
 ```
 or when using the for-each statement:
 ```bash
-foreach(emp : acme.employees) result = {?emp}.name;
+foreach(emp : acme.employees) result = emp.name;
 ```
 You can however get the same result by skipping looping entirely and just specifying the collection and target field:
 ```bash

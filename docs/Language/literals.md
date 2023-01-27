@@ -22,7 +22,7 @@ For example, adding the following two literals results in the creation of a new 
 ```bash
 addString = "First" + "Second"
 ```
-Evaluating by using {?addString} would result in "FirstSecond", likewise performing an addition on two arrays:
+Evaluating by using 'addString' would result in "FirstSecond", likewise performing an addition on two arrays:
 ```bash
 [1,2] + [3,4]
 ```

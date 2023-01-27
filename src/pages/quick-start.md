@@ -8,17 +8,17 @@ Create a new project declaring the following dependency in maven:
 <dependency>
   <groupId>dev.slop</groupId>
   <artifactId>slop-core</artifactId>
-  <version>1.2</version>
+  <version>1.35</version>
 </dependency>
 ``` 
 or gradle:
 ```groovy
-implementation 'dev.slop:slop-core:1.2'
+implementation 'dev.slop:slop-core:1.35'
 ```
 Add a new Java class with the following:
 ```java
 public static void main(String[] args) {
-    int result = SLOPProcessor.processStatic("(1 + 1) * 4").getValue(Integer.class);
+    int result = SLOPProcessor.processStatic('(1 + 1) * 4').getValue(Integer.class);
     System.out.println("Result: " + result);
 }
 ```
@@ -30,14 +30,14 @@ Alternatively for something a bit more ambitious:
 ```java
 public static void main(String[] args) {
     List<Integer> result = SLOPProcessor.processStatic(
-            "[a = 0,b = 1] + repeat(i++,0,<10) result = {?a} + {?b}; a = {?b}; b = {?result};"
+            "[a = 0,b = 1] + repeat(i++,0,<10) result = a + b; a = b; b = result;"
         ).getValue(List.class);
     System.out.println(String.format("Result: [%s]",
         result.stream().map(Object::toString).collect(Collectors.joining(", "))));
 }
 ```
 This will print the fibonacci sequence up to 12 places:
-```bash
+```
 Result: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 ```
 ...and that's it! If you'd like to see a detailed breakdown of this expression, please look [here](/docs/Language/Statements/variables#fibonacci-example-breakdown). 

@@ -13,7 +13,7 @@ similar to the for loop in most languages which consist of three parts. These ar
 The body of the repeat statement is a series of separate expression Strings that are separated by semi-colons. Let's look
 at the simplest example:
 ```
-repeat(i++,1,<11) result = {?i};
+repeat(i++,1,<11) result = i;
 ```
 The result of this is:
 ```
@@ -21,7 +21,7 @@ The result of this is:
 ```
 We can reverse that by doing the following:
 ```
-repeat(i--,10,>0) result = {?i};
+repeat(i--,10,>0) result = i;
 ```
 Which will result in:
 ```
@@ -33,7 +33,7 @@ assigned is used in the resulting array for that iteration. The order of express
 much like a standard language if you added a new line character between each e.g.:
 ```
 repeat(index++;0;<acme.employees.size())
-   salaryAge = acme.employees[{?index}].salary / acme.employees[{?index}.age; 
-   revCalculation = acme.revenue / {?salaryAge}; 
-   result = switch({?revCalculation})[< 2000: {?salaryAge} * 0.15;< 4000: {?salaryAge} * 0.10; ... ]
+   salaryAge = acme.employees[index].salary / acme.employees[index].age; 
+   revCalculation = acme.revenue / salaryAge; 
+   result = switch(revCalculation)[< 2000: salaryAge * 0.15;< 4000: salaryAge * 0.10; ... ]
 ```

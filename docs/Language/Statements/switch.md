@@ -81,5 +81,5 @@ For example, you could use:
 2. Similar to the multiple expressions suppported by the repeat and for-each, add the ability to add groups of expressions
 per case. As the current case syntax separator is already a semi-colon, an optional grouping could be added e.g.:
   ```java
-  switch(emp.age)[<30: {empAgeCompanyAge = $0 * acme.age; result = "R = " + {?empAgeCompanyAge}}]
+  switch(emp.age)[<30: {empAgeCompanyAge = $0 * acme.age; result = "R = " + empAgeCompanyAge}]
   ```

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 # Functions
@@ -20,11 +20,11 @@ public class RandomOp implements Function {
     public Token<?> execute(SLOPConfig config, List<Token<?>> values) {
         Random random = new Random();
         if (values.size() < 1 || values.size() > 2) {
-            throw new ParserException("Expected two arguments e.g. 'RAND(\"integer\", 1000)'");
+            throw new ParserException("Expected two arguments e.g. 'RAND('integer', 1000)'");
         }
         if (!(values.get(0).getValue() instanceof String)) {
             throw new ParserException("Expected random type (param 0) to be a String value. Valid values are: " +
-                    "\"integer\", \"double\", \"float\", \"long\", \"boolean\"");
+                    "'integer', 'double', 'float', 'long', 'boolean'");
         }
         String type = values.get(0).getValue(String.class);
         if (values.size() == 2) {

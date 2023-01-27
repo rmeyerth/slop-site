@@ -7,7 +7,7 @@ The foreach loop is a simplified version of the repeat statement. It simplifies 
 by iterating over a collection of objects assigning each value to a scoped variable. In the
 following example each employee in a collection is assigned to the variable 'emp':
 ```bash
-foreach(emp : acme.employees) result = "Name: " + {?emp}.name + ", Age: " + {?emp}.age;
+foreach(emp : acme.employees) result = "Name: " + emp.name + ", Age: " + emp.age;
 ```
 The result from this would be an array of Strings:
 ```bash
@@ -22,7 +22,7 @@ acme.employees.name
 Getting back to the for each, we can also filter the results back from the loop. In the following
 example we are filtering the names returned by age:
 ```bash
-foreach(emp : acme.employees) {?emp}.age > 40 ? result = {?emp}.name : null;
+foreach(emp : acme.employees) emp.age > 40 ? result = emp.name : null;
 ```
 This would just return the names of only those individuals older than 40. This use case is not perfect
 as you see we are only setting the result by using a conditional where the false case return an unused

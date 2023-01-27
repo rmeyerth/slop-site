@@ -6,6 +6,16 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
 import HomepageFeatures from '../components/HomepageFeatures';
 
+function NewRelease() {
+    return (
+        <header className={clsx('hero hero--dark', styles.deheroBanner)}>
+            <div className="container">
+                <p className="hero__subtitle">SLOP 1.35 Released - <a href="http://www.slop.dev/blog">See Details</a></p>
+            </div>
+        </header>
+    );
+}
+
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
   return (
@@ -31,6 +41,7 @@ export default function Home() {
     <Layout
       title={`${siteConfig.title}`}
       description="An extensible expression language">
+      <NewRelease />
       <HomepageHeader />
       <main>
         <HomepageFeatures />

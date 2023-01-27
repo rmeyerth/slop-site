@@ -224,11 +224,11 @@ Result: "first" (Time taken: 1ms)
 The maps are not type specific and can support anything you throw at it:
 ```bash
 > myVar = {"first"->1,2->"second"}
-> {?myVar}.put("third",3)
-> {?myVar}
+> myVar.put("third",3)
+> myVar
 Result: {"first"=1, 2="second", "third"=3} (Time taken: 1ms)
-> {?myVar}.remove("third")
-> {?myVar}
+> myVar.remove("third")
+> myVar
 Result: {"first"=1, 2="second"} (Time taken: 1ms)
 ```
 ## Type Operations
@@ -404,10 +404,10 @@ whether the original Map is updated but in this case we leave the state of the o
 new Map containing the result. If we wanted to reflect those changes back to the original map we would do:
 ```bash
 > myMap = {1->1,2->2,3->3}
-> {?myMap}
+> myMap
 Result: {1->1,2->2,3->3}
-> {?myMap} = {?myMap} - [2]
-> {?myMap}
+> myMap = myMap - [2]
+> myMap
 Result: {1->1,3->3}
 ```
 

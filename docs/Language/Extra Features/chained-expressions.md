@@ -26,8 +26,8 @@ for example:
     public void testAssignNameChainedExpression() {
         assertEquals(12, processor.process(Arrays.asList(
                 "resultA = 4 * 4",
-                "resultB = {?resultA} / 4",
-                "{?resultB} - 2"
+                "resultB = resultA / 4",
+                "resultB - 2"
         )).getValue());
     }
 ```

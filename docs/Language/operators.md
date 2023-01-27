@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 ---
 
 # Operators
@@ -27,7 +27,7 @@ addition of new operators is supported. Please see the [Custom Operators](#custo
 are only supported for special cases in specific statements. This is because at present the Parser does not
 support modification of variables directly, but have to be reassigned using the 'val = expr' pattern. An issue has
 been logged about this and will look to included in upcoming versions. Until that time to increment a variable
-please use 'myVar = {?myVar} + 1'.
+please use 'myVar = myVar + 1'.
 
 ## Logical Operators
 Logical Operators are used when wanting to perform multiple parts to a condition. Irrespective of the language used, they
