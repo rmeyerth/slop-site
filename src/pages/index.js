@@ -10,7 +10,7 @@ function NewRelease() {
     return (
         <header className={clsx('hero hero--dark', styles.deheroBanner)}>
             <div className="container">
-                <p className="hero__subtitle">SLOP 1.35 Released - <a href="http://www.slop.dev/blog">See Details</a></p>
+                <p className="hero__subtitle">SLOP 1.35 Released - <a style={{ color: 'darkblue' }} href="http://www.slop.dev/blog">See Details</a></p>
             </div>
         </header>
     );
