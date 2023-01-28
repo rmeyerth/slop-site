@@ -11,11 +11,11 @@
 }
 
 .deheroBanner {
-  padding: 20px 0 0 0;
+  padding: 0;
   text-align: center;
   position: relative;
   overflow: hidden;
-  height: 40px;
+  height: auto;
   background-color: #d99e00;
   vertical-align: center;
 }
