@@ -4,83 +4,147 @@ title: SLOP 1.35 Release
 authors: [tronied]
 tags: [slop]
 ---
-After working hard for the last couple of weeks on SLOP, I am happy to announce that SLOP 1.35 has been
-released. There have been numerous bug fixes and changes since the last release, so will briefly list them 
-below:
+After working hard for the last couple of weeks, I am pleased to announce that SLOP 1.35 has been
+released. There have been numerous bug fixes and changes since the last version. I will list a few of 
+them below:
 ### Variables
-Variable tags i.e. `{?myVariable}` have been replaced with regular name equivalents. For example:
+Referencing a variable tags i.e. `{?myVariable}`, has now been replaced with their regular name 
+equivalents (`myVariable`). As such, you can now do assignments and references using the reference:
 ```java
 > myVariable = 12
 Result: 12
 > myVariable
 Result: 12
-> newResult = myVariable - 4
+> newVariable = myVariable - 4
 Result: 8
-> [a = 0,b = 1] + repeat(i++,0,<10) result = a + b; a = b; b = result;
-Result: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+```
+Using the original quick start as an example for fibonacci (see [here](/docs/Language/Statements/variables#fibonacci-example-breakdown) for more details):
+```java
+[a = 0,b = 1] + repeat(i++,0,<10) result = {?a} + {?b}; a = {?b}; b = {?result};
+```
+This can now be replaced with the simpler definition:
+```java
+[a = 0,b = 1] + repeat(i++,0,<10) result = a + b; a = b; b = result;
 ```
 Please be aware that variables are case-sensitive, so you must use the same case when referencing. 
 ### Collection Filters
-Collection filtering can now be done using the traditional indexing section. If you wanted to filter 
-and map collection items, you would have to use a loop:
-```bash
-> foreach (emp : acme.employees) if (emp.age < 40) result = emp.name;
-Result: ['Mary','Bob']
+Conditional filtering can now be done using a collections indexing section. Let's take the following
+example where the context is initialised with a sample company and its employees. There is also an array 
+of top earners which we'll reference later:
+```java
+private static Company sampleCompany() {
+    Company company = new Company();
+    company.getEmployees().add(Employee.builder()
+            .employeeId("EMP1").payrollId(123).name("Bob").age(37).build());
+    company.getEmployees().add(Employee.builder()
+            .employeeId("EMP2").payrollId(321).name("Sharon").age(54).build());
+    company.getEmployees().add(Employee.builder()
+            .employeeId("EMP3").payrollId(789).name("Mike").age(49).build());
+    company.getEmployees().add(Employee.builder()
+            .employeeId("EMP4").payrollId(987).name("Anna").age(25).build());
+    company.getTopEarners().add(321);
+    company.getTopEarners().add(987);
+    return acme;
+}
+
+public static void main(String[] args) {
+    //Create and initialise context
+    SLOPContext context = new SLOPContext();
+    context.set("acme", sampleCompany());
+    //Create config and allow unsafe operations
+    SLOPConfig config = new SLOPConfig();
+    config.setProperty(DefaultProperty.SAFE_OPERATIONS, false);    
+    SLOPProcessor processor = new SLOPProcessor(config);
+    //Use passed parameter to the app and print result
+    System.out.println(String.format("Result: %s", 
+        processor.processStatic(args[0], context));
+}
 ```
-Now you can remove the loop entirely and use the following:
+Traditionally, if you wanted to filter and map collection items, you would have to use a loop in your
+expression:
 ```bash
-> acme.employees[^~age < 40].name
-Result: ['Mary','Bob']
+foreach (emp : acme.employees) if (emp.age < 40) result = emp.name;
 ```
-The initial '^' character flags up to the Parser that this is using conditions rather than index filtering. 
-The '~' character denotes that any following field references should be taken from the items within the
-collection. You can define a condition as you would normally and that includes the use of logical operators.
+You can now remove the loop entirely by using the following:
+```bash
+acme.employees[^~age < 40].name
+```
+Both of the above result in the following:
+```bash
+Result: ['Bob', 'Anna']
+```
+The initial '^' character flags up to the Parser that this is using condition criteria rather than 
+the standard integer index. The '~' character denotes that any field reference following it should be 
+taken from the item being iterated in the collection. You have free-reign over how you define conditions
+so long as they evaluate to booleans. This includes the use of logical operators:
 For example:
 ```bash
 acme.employees[^acme.topEarners.contains(~payrollId) and ~name.startsWith('S')]
-> Result: Employee(employeeId='EMP4326', name='Sharon', payrollId=114, age=43)
 ```
-As can be seen this is using a more complicated condition. In the case above we're using a native call to
-check to filter those employees who exist on the topEarners collection. Secondly, that their name starts 
-with an 'S' which results Sharons employee object being returned.
+This would output the object:
+```bash
+Result: Employee(employeeId='EMP2', payrollId=321, name='Sharon', age=54)
+```
+In the case above we're using the collection native call contains() on the topEarners list to filter to 
+those employees that have a matching payroll ID. Second to this, a second native call startsWith() is 
+used to filter names to those beginning with an 'S'. This results in the Sharons employee object being 
+returned. If we wanted to fetch this object in its Java native form, we would use:
+```java
+Employee result = processor.process(args[0], context).getValue(Employee.class);
+```
 ### Static Referencing
-You can now add references to classes which may exist outside your context. These may be enums which you
-would want to reference. To do this we'll need to add a classpath reference in the context:
+You can now add references to enums and static class methods via a new include() method in the 
+configuration object. Let's see this in action by adding an enum we want to reference:
 ```bash
 SLOPConfig config = new SLOPConfig();
 config.include("testEnum", "dev.slop.enums.TestEnum");
-config.include("testClass", "dev.slop.model.TestClass");
 ```
-We can now reference a value within the class or enum by using the '#' symbol. For example:
-```
-> (#testEnum.VALUE_A.value + 124) / 4
-Result: 31
-```
-We can now also reference enum values within a public inner class e.g.
+For reference this enum has the following definition:
 ```java
-public class TestClass {
+package dev.slop.enums;
 
-    public enum TestEnum {
-        VALUE_A(1),
-        VALUE_B(2),
-        VALUE_C(3);
+public enum TestEnum {
+    VALUE_A(1),
+    VALUE_B(2),
+    VALUE_C(3);
 
-        private int value;
+    private int value;
 
-        TestEnum(int value) {
-            this.value = value;
-        }
+    TestEnum(int value) {
+        this.value = value;
+    }
 
-        public int getValue() {
-            return this.value;
-        }
+    public int getValue() {
+        return this.value;
     }
 }
 ```
-To do this use the '$' character before the declared inner class:
+We can now reference a value within the enum by using the '#' symbol. For example:
 ```
-> (#testClass.$TestEnum.VALUE_A.value + 124) / 4
+(#testEnum.VALUE_A.value + 124) / 4
+```
+Would result in:
+```bash
 Result: 31
+```
+We can now also reference enums within another class by using the '$' character. For example, using
+the same enum but located within another class, first we include the reference:
+```java
+config.include("testClass", "dev.slop.model.TestClass");
+```
+With the following defined class but the same enum:
+```java
+package dev.slop.model;
+
+public class TestClass {
+    public enum TestEnum {
+        ...
+    }
+}
+```
+We can perform the following for the same result:
+```
+(#testClass.$TestEnum.VALUE_A.value + 124) / 4
 ```
 ### Unary Operator
 This was an oversight on my part and now have happily added the ability to use '!' in front of a Boolean 
@@ -138,5 +202,5 @@ planned in the coming months. One of these is the ability to assign values to to
 tokens will remain immutable as it makes no sense to assign values to them, but certain ones like 
 the ability to modify values within the structure of a context object or collection are on my radar.
 
-As always, if you have any feedback, questions or concerns please send an email to tronied@yahoo.com
+As always, if you have any feedback, questions or concerns please email me at rmeyer@hotmail.co.uk
 or head on over to the board [here](https://slop.boards.net). 
