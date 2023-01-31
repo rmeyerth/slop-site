@@ -8,8 +8,8 @@ After working hard for the last couple of weeks, I am pleased to announce that S
 released. There have been numerous fixes and changes since the last version. I will list a few of 
 them below:
 ### Variables
-Referencing variable tags i.e. `{?myVariable}` have now been replaced with their regular name equivalents 
-`myVariable`. As such, you can now perform assignments and references using the same tag:
+Referencing variable tags i.e. `{?myVariable}` has now been replaced with their regular name equivalents 
+e.g. `myVariable`. As such, you can now perform assignments and references using the same tag:
 ```java
 > myVariable = 12
 Result: 12
@@ -28,9 +28,9 @@ This is now replaced with the simpler definition:
 ```
 Please be aware that variables are case-sensitive, so you must use the same case when referencing. 
 ### Collection Filters
-Conditional filtering can now be done using a collections indexing section. Let's take the following
-example where the context is initialised with a sample company and its employees. There is also an array 
-of top earners which we'll reference later:
+Conditional filtering can now be done using the collections indexing section. Using the following example, 
+the context is initialised with a sample company and employees. There is also an array of top earners 
+which we'll reference later:
 ```java
 private static Company sampleCompany() {
     Company company = new Company();
@@ -69,26 +69,25 @@ You can now remove the loop entirely by using the following:
 ```bash
 acme.employees[^~age < 40].name
 ```
-Both of the above result in the following:
+Both of the above provide the following result:
 ```bash
 Result: ['Bob', 'Anna']
 ```
 The initial '^' character flags up to the Parser that this is using condition criteria rather than 
-the standard integer index. The '~' character denotes that any field reference following it should be 
+a standard integer index. The '~' character denotes that any field reference following it should be 
 taken from the item being iterated in the collection. You have free-reign over how you define conditions
-so long as they evaluate to booleans. This includes the use of logical operators:
-For example:
+so long as they evaluate to booleans. This includes the use of logical operators, for example:
 ```bash
 acme.employees[^acme.topEarners.contains(~payrollId) and ~name.startsWith('S')]
 ```
-This would output the object:
+As we're not defining a field, this would output the entire matched object:
 ```bash
 Result: Employee(employeeId='EMP2', payrollId=321, name='Sharon', age=54)
 ```
-In the case above we're using the collection native call contains() on the topEarners list to filter to 
+In the expression above we're using the collection native call contains() on the topEarners list to filter to 
 those employees that have a matching payroll ID. Second to this, a second native call startsWith() is 
-used to filter names to those beginning with an 'S'. This results in the Sharons employee object being 
-returned. If we wanted to fetch this object in its Java native form, we would use:
+used to filter names beginning with an 'S'. This results in Sharons employee object being returned. If we wanted 
+to fetch this object in its Java native form, we would use:
 ```java
 Employee result = processor.process(args[0], context).getValue(Employee.class);
 ```
