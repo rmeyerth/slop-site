@@ -5,11 +5,11 @@ authors: [tronied]
 tags: [slop]
 ---
 After working hard for the last couple of weeks, I am pleased to announce that SLOP 1.35 has been
-released. There have been numerous bug fixes and changes since the last version. I will list a few of 
+released. There have been numerous fixes and changes since the last version. I will list a few of 
 them below:
 ### Variables
-Referencing a variable tags i.e. `{?myVariable}`, has now been replaced with their regular name 
-equivalents (`myVariable`). As such, you can now do assignments and references using the reference:
+Referencing variable tags i.e. `{?myVariable}` have now been replaced with their regular name equivalents 
+`myVariable`. As such, you can now perform assignments and references using the same tag:
 ```java
 > myVariable = 12
 Result: 12
@@ -18,11 +18,11 @@ Result: 12
 > newVariable = myVariable - 4
 Result: 8
 ```
-Using the original quick start as an example for fibonacci (see [here](/docs/Language/Statements/variables#fibonacci-example-breakdown) for more details):
+For comparison, here is the original fibonacci example (see [here](/docs/Language/Statements/variables#fibonacci-example-breakdown) for more details):
 ```java
 [a = 0,b = 1] + repeat(i++,0,<10) result = {?a} + {?b}; a = {?b}; b = {?result};
 ```
-This can now be replaced with the simpler definition:
+This is now replaced with the simpler definition:
 ```java
 [a = 0,b = 1] + repeat(i++,0,<10) result = a + b; a = b; b = result;
 ```
