@@ -28,9 +28,9 @@ This is now replaced with the simpler definition:
 ```
 Please be aware that variables are case-sensitive, so you must use the same case when referencing. 
 ### Collection Filters
-Conditional filtering can now be done using the collections indexing section. Using the following example, 
+Conditional filtering can now be done using the collections index section. Using the following example, 
 the context is initialised with a sample company and employees. There is also an array of top earners 
-which we'll reference later:
+that we'll reference later:
 ```java
 private static Company sampleCompany() {
     Company company = new Company();
@@ -173,11 +173,11 @@ dev.slop.exception.LexerException: Expected token ',' in RepeatToken but express
 In the above example, we have mistakenly used semi-colons instead of commas when defining the repeat
 loop. It is showing that it expected the token ',' and will provide guidance where it thinks you have
 gone wrong. This is now implemented by all statements and in case you are looking to add this to your
-own additions, this occurs by overriding the following method in your Token class:
+own tokens, this occurs by overriding the following method in your Token class:
 ```java
 @Override
-public Optional<String> getGuidance(String token, List<Integer> groupsCount) {
-    if (token.equalsIgnoreCase(","))
+public Optional<String> getGuidance(String expected, List<Integer> groupsCount) {
+    if (expected.equalsIgnoreCase(","))
         return Optional.of("A repeat statement requires 3 parts of the iteration to be defined and " +
             "separated by a ',' character e.g. repeat ( i++, 0, <10 ) ...");
     ...
@@ -186,11 +186,11 @@ public Optional<String> getGuidance(String token, List<Integer> groupsCount) {
 ### LinkedHashMap Support
 SLOP now supports the use of LinkedHashMap's. The reason for this may not be clear unless you are 
 familiar with JSON and use it frequently in serialisation / de-serialisation. What this allows you 
-to do is create an endpoint i.e. REST which allows a JSON payload to be pushed to a POST endpoint.
-This can be serialised into a LinkedHashMap which can now be set directly into the SLOP context 
-and act like a normal model object. This means you don't have to have the objects or DTO's on the 
-classpath to use them in SLOP expressions. They work in exactly the same way as objects added to the
-context and allows SLOP to work independently of any code dependencies.
+to do for example is create a POST REST endpoint that allows unstructured JSON payloads to be pushed.
+This can be serialised into a LinkedHashMap and passed directly into the SLOP context to act like a 
+normal model object. This means you don't have to have the class definition or DTO's on the classpath 
+to use them in SLOP expressions. Once added they work in exactly the same way as normal objects allowing 
+SLOP to work independently of additional code dependencies.
 
 ### Closing Comments
 There are many other changes and bug fixes I have made, but without turning this into war and peace I 
