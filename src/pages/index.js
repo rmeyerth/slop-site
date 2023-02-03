@@ -20,6 +20,7 @@ function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
+      <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"></meta>
       <div className="container">
         <h1 className="hero__title">Single Line Operations Processor</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
