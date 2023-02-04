@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 
-const addRecordEndpoint = "http://slop-load-584882553.eu-west-2.elb.amazonaws.com/api/v1/request";
+const addRecordEndpoint = "https://slop-load-911801315.eu-west-2.elb.amazonaws.com/api/v1/request";
 
 const addNewRecord = async (Title, Author) => {
   const RecordBodyParameters = {
