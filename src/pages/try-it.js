@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 
-const addRecordEndpoint = "https://demo.slop.dev:8080/api/v1/request";
+const addRecordEndpoint = "https://demo.slop.dev/api/v1/request";
 
 const addNewRecord = async (Title, Author) => {
   const RecordBodyParameters = {
