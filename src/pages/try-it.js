@@ -14,8 +14,7 @@ const addNewRecord = async (Title, Author) => {
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'DELETE, POST, GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With'
+      'Access-Control-Allow-Methods': 'POST'
     },
     body: JSON.stringify(RecordBodyParameters)
   }
