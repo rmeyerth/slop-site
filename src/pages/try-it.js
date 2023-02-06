@@ -9,7 +9,7 @@ const StyledInput = styled.input`
   display: block;
   margin: 0px 0px;
   border: 1px solid lightblue;
-  width: 740px;
+  width: 850px;
   height: 30px;
 `;
 
@@ -132,13 +132,15 @@ function RenderResult() {
 <div style={{display: "flex", width: '100%', justifyContent: "center", paddingTop: 20}}>
     <div style={{paddingBottom: 30, width:850}}>
       <h1>SLOP - Try it now</h1>
+      <form>
         <div style={{display: "flex", marginBottom: 10}}>
           <StyledInput {...inputProps} placeholder="Type expression here..." value={titleValue} id="title-input" onChange={HandleTitleChange} />&nbsp;&nbsp;
-      <Button onClick={ButtonClick}>Evaluate</Button>
         </div>
         <div style={{marginBottom: 10}}>
           <JSONInput id='author-input' height='450px' width='850px' placeholder={sampleJson} onChange={HandleAuthorChange} />
         </div>
+      </form>
+      <Button onClick={ButtonClick}>Evaluate</Button>
       <div style={{width: 850, height: 100, backgroundColor: "lightgray", borderColor: "black", borderStyle: "dashed"}}>{apiResponse}</div>
     </div></div>
   );
