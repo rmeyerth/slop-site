@@ -7,9 +7,9 @@ const addRecordEndpoint = "https://1345-18-170-107-134.eu.ngrok.io/api/v1/reques
 
 const StyledInput = styled.input`
   display: block;
-  margin: 20px 0px;
+  margin: 0px 0px;
   border: 1px solid lightblue;
-  width: 850px;
+  width: 740px;
   height: 30px;
 `;
 
@@ -31,7 +31,7 @@ const Button = styled.button`
   border-radius: 5px;
   outline: 0;
   text-transform: uppercase;
-  margin: 10px 0px;
+  margin: 0px 0px;
   cursor: pointer;
   box-shadow: 0px 2px 2px lightgray;
   transition: ease background-color 250ms;
@@ -129,19 +129,20 @@ function RenderResult() {
   }
 
   return (
-    <div style={{alignSelf: "center", justifyContent: "center", alignItems: "center", width:850}}>
+<div style={{display: "flex", width: '100%', justifyContent: "center", paddingTop: 20}}>
+    <div style={{paddingBottom: 30, width:850}}>
       <h1>SLOP - Try it now</h1>
       <form>
-        <div>
-          <StyledInput {...inputProps} placeholder="Type expression here..." value={titleValue} id="title-input" onChange={HandleTitleChange} />
+        <div style={{display: "flex", marginBottom: 10}}>
+          <StyledInput {...inputProps} placeholder="Type expression here..." value={titleValue} id="title-input" onChange={HandleTitleChange} />&nbsp;&nbsp;
+      <Button onClick={ButtonClick}>Evaluate</Button>
         </div>
-        <div>
-          <JSONInput id='author-input' height='550px' width='850px' placeholder={sampleJson} onChange={HandleAuthorChange} />
+        <div style={{marginBottom: 10}}>
+          <JSONInput id='author-input' height='450px' width='850px' placeholder={sampleJson} onChange={HandleAuthorChange} />
         </div>
       </form>
-      <Button onClick={ButtonClick}>Evaluate</Button>
-      <div style={{width: 850, backgroundColor: "lightgray", borderColor: "black", borderStyle: "dashed"}}>{apiResponse}</div>
-    </div>
+      <div style={{width: 850, height: 100, backgroundColor: "lightgray", borderColor: "black", borderStyle: "dashed"}}>{apiResponse}</div>
+    </div></div>
   );
 };
 
