@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkslop_site=self.webpackChunkslop_site||[]).push([[7683],{7343:s=>{s.exports=JSON.parse('{"permalink":"/slop-site/blog/tags/slop","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);
