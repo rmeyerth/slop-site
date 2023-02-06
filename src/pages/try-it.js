@@ -1,9 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
+import JSONInput from 'react-json-editor-ajrm';
+import styled from 'styled-components';
 
 const addRecordEndpoint = "https://1345-18-170-107-134.eu.ngrok.io/api/v1/request";
 
+const StyledInput = styled.input`
+  display: block;
+  margin: 20px 0px;
+  border: 1px solid lightblue;
+  width: 850px;
+  height: 30px;
+`;
+
+const theme = {
+  blue: {
+    default: "#3f51b5",
+    hover: "#283593"
+  },
+  pink: {
+    default: "#e91e63",
+    hover: "#ad1457"
+  }
+}
+
+const Button = styled.button`
+  background-color: ${(props) => theme[props.theme].default};
+  color: white;
+  padding: 5px 15px;
+  border-radius: 5px;
+  outline: 0;
+  text-transform: uppercase;
+  margin: 10px 0px;
+  cursor: pointer;
+  box-shadow: 0px 2px 2px lightgray;
+  transition: ease background-color 250ms;
+  &:hover {
+    background-color: ${(props) => theme[props.theme].hover};
+  }
+  &:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+`;
+
+Button.defaultProps = {
+  theme: "blue"
+}
+
+function useInput(defaultValue) {
+  const [value, setValue] = useState(defaultValue);
+  function onChange(e) {
+    setValue(e.target.value);
+  }
+  return {
+    value,
+    onChange,
+  };
+}
+
 const addNewRecord = async (Title, Author) => {
+  console.log(Author);
   const RecordBodyParameters = {
     'expression': Title,
     'payload': JSON.parse(Author)
@@ -25,7 +82,30 @@ const addNewRecord = async (Title, Author) => {
   return jsonResponse;
 };
 
+const sampleJson = {
+  "name": "Acme Corp",
+    "employees": [
+  {
+    "name": "Bob",
+    "age": 23
+  },
+  {
+    "name": "Sally",
+    "age": 49
+  },
+  {
+    "name": "Terrence",
+    "age": 60
+  },
+  {
+    "name": "Anna",
+    "age": 25
+  }
+]
+}
+
 function RenderResult() {
+  const inputProps = useInput();
   const [apiResponse, setApiResponse] = useState("> ");
   const [titleValue, setTitleValue] = useState("");
   const [authorValue, setAuthorValue] = useState("");
@@ -36,7 +116,7 @@ function RenderResult() {
   }
 
   function HandleAuthorChange(event) {
-    setAuthorValue(event.target.value);
+    setAuthorValue(event.json);
   }
 
   function ButtonClick() {
@@ -49,20 +129,18 @@ function RenderResult() {
   }
 
   return (
-    <div>
-      <h1>React App</h1>
-      <ul>{apiResponse}</ul>
+    <div style={{alignSelf: "center", justifyContent: "center", alignItems: "center", width:850}}>
+      <h1>SLOP - Try it now</h1>
       <form>
         <div>
-          <label htmlFor="title-input">Expression:</label>
-          <input style={{width: 600}} type="text" value={titleValue} id="title-input" onChange={HandleTitleChange} />
+          <StyledInput {...inputProps} placeholder="Type expression here..." value={titleValue} id="title-input" onChange={HandleTitleChange} />
         </div>
         <div>
-          <label htmlFor="author-input">JSON Payload:</label>
-          <textarea style={{width: 600, height: 400}} type="text" value={authorValue} id="author-input" onChange={HandleAuthorChange} />
+          <JSONInput id='author-input' height='550px' width='850px' placeholder={sampleJson} onChange={HandleAuthorChange} />
         </div>
-        <button type="button" onClick={ButtonClick}>Add data</button>
       </form>
+      <Button onClick={ButtonClick}>Evaluate</Button>
+      <div style={{width: 850, backgroundColor: "lightgray", borderColor: "black", borderStyle: "dashed"}}>{apiResponse}</div>
     </div>
   );
 };
