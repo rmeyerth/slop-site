@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 
-const addRecordEndpoint = "https://cf2e-18-170-107-134.eu.ngrok.io/api/v1/request";
+const addRecordEndpoint = "https://1345-18-170-107-134.eu.ngrok.io/api/v1/request";
 
 const addNewRecord = async (Title, Author) => {
   const RecordBodyParameters = {
