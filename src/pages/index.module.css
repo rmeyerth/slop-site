@@ -31,3 +31,7 @@
   align-items: center;
   justify-content: center;
 }
+
+.navbar__link_blah {
+  color: #d99e00;
+}

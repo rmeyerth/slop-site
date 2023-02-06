@@ -9,7 +9,7 @@ const StyledInput = styled.input`
   display: block;
   margin: 0px 0px;
   border: 1px solid lightblue;
-  width: 850px;
+  width: 100%;
   height: 30px;
 `;
 
@@ -108,7 +108,7 @@ function RenderResult() {
   const inputProps = useInput();
   const [apiResponse, setApiResponse] = useState("> ");
   const [titleValue, setTitleValue] = useState("");
-  const [authorValue, setAuthorValue] = useState("");
+  const [authorValue, setAuthorValue] = useState(JSON.stringify(sampleJson));
   const [successCounter, setSuccessCounter] = useState(0);
 
   function HandleTitleChange(event) {
@@ -129,19 +129,20 @@ function RenderResult() {
   }
 
   return (
-<div style={{display: "flex", width: '100%', justifyContent: "center", paddingTop: 20}}>
-    <div style={{paddingBottom: 30, width:850}}>
-      <h1>SLOP - Try it now</h1>
+<div style={{display: "flex", width: '100%', justifyContent: "center", paddingTop: 30, paddingLeft: 20, paddingRight: 20}}>
+    <div style={{display: "block", boxSizing: "border-box", flexGrow: 1, paddingBottom: 30, maxWidth:'1280px'}}>
+      <h1>Try it for yourself!</h1>
       <form>
         <div style={{display: "flex", marginBottom: 10}}>
-          <StyledInput {...inputProps} placeholder="Type expression here..." value={titleValue} id="title-input" onChange={HandleTitleChange} />&nbsp;&nbsp;
+          <StyledInput {...inputProps} placeholder="Type expression here..." value={titleValue} id="title-input" onChange={HandleTitleChange} />
         </div>
         <div style={{marginBottom: 10}}>
-          <JSONInput id='author-input' height='450px' width='850px' placeholder={sampleJson} onChange={HandleAuthorChange} />
+          <JSONInput id='author-input' height='450px' width='100%' placeholder={sampleJson} onChange={HandleAuthorChange} />
         </div>
       </form>
       <Button onClick={ButtonClick}>Evaluate</Button>
-      <div style={{width: 850, height: 100, backgroundColor: "lightgray", borderColor: "black", borderStyle: "dashed"}}>{apiResponse}</div>
+      <div style={{height: 10}}/>
+      <div style={{width: '100%', height: 100, backgroundColor: "lightgray", borderColor: "black", borderStyle: "dashed"}}>{apiResponse}</div>
     </div></div>
   );
 };
