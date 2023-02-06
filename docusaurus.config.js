@@ -9,7 +9,7 @@ const config = {
   title: 'SLOP - Expression Language',
   tagline: 'Dynamically configure your projects away from code deployments',
   url: 'http://www.slop.dev',
-  baseUrl: '/slop-site/',
+  baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/slop.ico',
