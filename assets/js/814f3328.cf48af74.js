@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkslop_site=self.webpackChunkslop_site||[]).push([[2535],{5641:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"SLOP 1.35 Release","permalink":"/blog/release"}]}')}}]);
