@@ -5,8 +5,9 @@ import {
     shorthands,
     tokens,
     Tab,
+    Text,
     TabList,
-    TabValue
+    TabValue, Button
 } from "@fluentui/react-components";
 import {
     AirplaneRegular,
@@ -15,9 +16,12 @@ import {
     AirplaneTakeOffFilled,
     TimeAndWeatherRegular,
     TimeAndWeatherFilled,
-    bundleIcon
+    bundleIcon,
+    CalendarAgendaRegular,
+    CalendarAgendaFilled,
 } from "@fluentui/react-icons";
 import {useState} from "react";
+const CalendarAgenda = bundleIcon(CalendarAgendaFilled, CalendarAgendaRegular);
 const Airplane = bundleIcon(AirplaneFilled, AirplaneRegular);
 const AirplaneTakeOff = bundleIcon(
     AirplaneTakeOffFilled,
@@ -26,25 +30,27 @@ const AirplaneTakeOff = bundleIcon(
 const TimeAndWeather = bundleIcon(TimeAndWeatherFilled, TimeAndWeatherRegular);
 const useStyles = makeStyles({
     root: {
-        alignItems: "flex-start",
+        alignItems: "stretch",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-start",
-        rowGap: "20px"
+        justifyContent: "stretch",
+        rowGap: "5px",
     },
     panels: {
-        ...shorthands.padding(0, "10px"),
+        maxWidth: '100%',
+        ...shorthands.padding(0, 0),
         "& th": {
             textAlign: "left",
-            ...shorthands.padding(0, "30px", 0, 0),
+            ...shorthands.padding(0, 0, 0, 0),
         }
     },
     propsTable: {
+        maxWidth: '100%',
         "& td:first-child": {
             fontWeight: tokens.fontWeightSemibold,
         },
         "& td": {
-            ...shorthands.padding(0, "30px", 0, 0),
+            ...shorthands.padding(0, 0, 0, 0),
         }
     }
 });
@@ -73,7 +79,7 @@ const sampleJson = {
 
 export const WithPanels = () => {
     const styles = useStyles();
-    const [selectedValue, setSelectedValue] = useState("conditions");
+    const [selectedValue, setSelectedValue] = useState("acme");
     const onTabSelect = (event, data) => {
         setSelectedValue(data.value);
     };
@@ -82,82 +88,24 @@ export const WithPanels = () => {
         console.log(event.json);
     }
 
-    const Arrivals = React.memo(() => (
-        <div role="tabpanel" aria-labelledby="Arrivals">
-            <div style={{marginBottom: 10}}>
-                <JSONInput id='author-input' height='450px' width='100%' placeholder={sampleJson} onChange={HandleAuthorChange} />
-            </div>
-        </div>
-    ));
-    const Departures = React.memo(() => (
-        <div role="tabpanel" aria-labelledby="Departures">
-            <table>
-                <thead>
-                <th>Destination</th>
-                <th>Gate</th>
-                <th>ETD</th>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>MSP</td>
-                    <td>A7</td>
-                    <td>8:26 AM</td>
-                </tr>
-                <tr>
-                    <td>DCA</td>
-                    <td>N2</td>
-                    <td>9:03 AM</td>
-                </tr>
-                <tr>
-                    <td>LAS</td>
-                    <td>E15</td>
-                    <td>2:36 PM</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    ));
-    const Conditions = React.memo(() => (
-        <div role="tabpanel" aria-labelledby="Conditions">
-            <table className={styles.propsTable}>
-                <tbody>
-                <tr>
-                    <td>Time</td>
-                    <td>6:45 AM</td>
-                </tr>
-                <tr>
-                    <td>Temperature</td>
-                    <td>68F / 20C</td>
-                </tr>
-                <tr>
-                    <td>Forecast</td>
-                    <td>Overcast</td>
-                </tr>
-                <tr>
-                    <td>Visibility</td>
-                    <td>0.5 miles, 1800 ft runway visual range</td>
-                </tr>
-                </tbody>
-            </table>
+    const Payload = React.memo(() => (
+        <div role="tabpanel" aria-labelledby="acme" style={{minWidth: '100%', width: '100%'}}>
+            <JSONInput id='author-input' height='450px' width='100%' placeholder={sampleJson} onChange={HandleAuthorChange} />
         </div>
     ));
     return (
         <div className={styles.root}>
-            <TabList selectedValue={selectedValue} onTabSelect={onTabSelect}>
-                <Tab id="Arrivals" icon={<Airplane />} value="arrivals">
-                    Arrivals
-                </Tab>
-                <Tab id="Departures" icon={<AirplaneTakeOff />} value="departures">
-                    Departures
-                </Tab>
-                <Tab id="Conditions" icon={<TimeAndWeather />} value="conditions">
-                    Conditions
+            <TabList selectedValue={selectedValue} onTabSelect={onTabSelect} style={{minWidth: '100%'}}>
+                <div style={{paddingTop: '10px'}}>
+                    <Text style={{fontWeight: "bold"}}>Context Objects:&nbsp;&nbsp;&nbsp;</Text>
+                    <Button appearance="primary">Add</Button>
+                </div>
+                <Tab id="acme" icon={<CalendarAgenda/>} value="acme">
+                    acme
                 </Tab>
             </TabList>
             <div className={styles.panels}>
-                {selectedValue === "arrivals" && <Arrivals />}
-                {selectedValue === "departures" && <Departures />}
-                {selectedValue === "conditions" && <Conditions />}
+                {selectedValue === "acme" && <Payload />}
             </div>
         </div>
     );

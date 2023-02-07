@@ -32,6 +32,7 @@
     "react-nested-menu-selector": "^0.1.0",
     "react-popper": "^2.3.0",
     "react-select-multi-level": "^1.0.1",
+    "react-svg": "^16.1.0",
     "react-transition-group": "^4.4.5",
     "reactdom": "^2.0.0",
     "reactstrap": "^9.1.5",

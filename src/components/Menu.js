@@ -65,7 +65,7 @@ export const NestedSubmenus = () => {
     return (
         <Menu>
             <MenuTrigger disableButtonEnhancement>
-                <Button>Toggle menu</Button>
+                <Button appearance="primary">Examples</Button>
             </MenuTrigger>
 
             <MenuPopover>
