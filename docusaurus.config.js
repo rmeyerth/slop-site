@@ -91,6 +91,10 @@ const config = {
                 label: 'Forum',
                 href: 'http://slop.boards.net',
               },
+              {
+                label: 'Credits',
+                href: '/credits'
+              }
             ],
           },
           {

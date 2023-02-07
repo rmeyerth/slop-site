@@ -18,12 +18,23 @@
   "dependencies": {
     "@docusaurus/core": "^2.0.0-beta.20",
     "@docusaurus/preset-classic": "^2.0.0-beta.20",
+    "@fluentui/react-components": "^9.13.0",
+    "@fluentui/react-icons": "^2.0.193",
+    "@fluentui/react-tabs": "^9.2.1",
     "@mdx-js/react": "^1.6.21",
     "clsx": "^1.1.1",
     "prism-react-renderer": "^1.2.1",
+    "rc-menu": "^9.8.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-json-editor-ajrm": "^2.5.14",
+    "react-nested-dropdown": "^0.0.10",
+    "react-nested-menu-selector": "^0.1.0",
+    "react-popper": "^2.3.0",
+    "react-select-multi-level": "^1.0.1",
+    "react-transition-group": "^4.4.5",
+    "reactdom": "^2.0.0",
+    "reactstrap": "^9.1.5",
     "styled-components": "^5.3.6"
   },
   "browserslist": {
