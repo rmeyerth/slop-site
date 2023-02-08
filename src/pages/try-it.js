@@ -1,25 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useContext} from 'react';
 import Layout from '@theme/Layout';
-import { ReactSVG } from 'react-svg';
 import {
   FluentProvider,
   teamsLightTheme,
   Text,
-  Button, Image, makeStyles,
+  Button, Image, makeStyles, Link,
 } from '@fluentui/react-components';
 import {
   BookQuestionMark20Regular,
   BookQuestionMark20Filled,
   bundleIcon,
   iconFilledClassName,
-  iconRegularClassName
+  iconRegularClassName,
+  Play20Regular,
+  Play20Filled,
 } from "@fluentui/react-icons";
 
 import {WithPanels} from "../components/TabbedCode";
 import {Appearance} from "../components/Appearance";
 import {NestedSubmenus} from "../components/Menu";
 
-const addRecordEndpoint = "https://1345-18-170-107-134.eu.ngrok.io/api/v1/request";
+const runExpressionEndpoint = "https://1345-18-170-107-134.eu.ngrok.io/api/v1/request";
 
 Button.defaultProps = {
   theme: "blue"
@@ -36,11 +37,10 @@ function useInput(defaultValue) {
   };
 }
 
-const addNewRecord = async (Title, Author) => {
-  console.log(Author);
+const addNewRecord = async (expression, payload) => {
   const RecordBodyParameters = {
-    'expression': Title,
-    'payload': JSON.parse(Author)
+    'expression': expression,
+    'payload': JSON.parse(payload)
   }
 
   const options = {
@@ -53,7 +53,7 @@ const addNewRecord = async (Title, Author) => {
     body: JSON.stringify(RecordBodyParameters)
   }
 
-  const response = await fetch(addRecordEndpoint, options);
+  const response = await fetch(runExpressionEndpoint, options);
   const jsonResponse = await response.text();
   console.log(JSON.stringify(jsonResponse));
   return jsonResponse;
@@ -97,27 +97,26 @@ const useIconStyles = makeStyles({
       }
     }
   }
-})
+});
 
 export const QuestionMark = bundleIcon(BookQuestionMark20Filled, BookQuestionMark20Regular);
+export const RunExpression = bundleIcon(Play20Filled, Play20Regular);
 
 function RenderResult() {
-  const inputProps = useInput();
   const [apiResponse, setApiResponse] = useState("> ");
-  const [titleValue, setTitleValue] = useState("");
-  const [authorValue, setAuthorValue] = useState(JSON.stringify({sampleJson}));
-  const [successCounter, setSuccessCounter] = useState(0);
+  const [expressionValue, setExpressionValue] = useState("");
+  const [contextValue, setContextValue] = useState(JSON.stringify(sampleJson));
 
-  function HandleTitleChange(event) {
-    setTitleValue(event.target.value);
+  function handleExpressionChange(event) {
+    setExpressionValue(event.target.value);
   }
 
-  function HandleAuthorChange(event) {
-    setAuthorValue(event.json);
+  function handlePayloadChange(event) {
+    setContextValue(event.json);
   }
 
   function ButtonClick() {
-    addNewRecord(titleValue, authorValue)
+    addNewRecord(expressionValue, contextValue)
       .then(response => {
           console.log(response);
           setApiResponse('> ' + response);
@@ -128,45 +127,48 @@ function RenderResult() {
   const styles = useIconStyles();
   return (
       <FluentProvider theme={teamsLightTheme}>
-    <div style={{display: "flex", width: '100%', justifyContent: "center", paddingTop: 30, paddingLeft: 20, paddingRight: 20}}>
-      <div style={{display: "block", boxSizing: "border-box", flexGrow: 1, paddingBottom: 30, maxWidth:'1280px'}}>
-          <h1>SLOP Playground</h1>
-          <div style={{paddingBottom: 10}}>
-            <Text align="justify">Below you can run expressions using version 1.35 of SLOP. Define your own or select one of the pre-configured examples:</Text>
-          </div>
-          <form>
-            <div style={{display: "flex", width: '100%', marginBottom: 10}}>
-              <Appearance/>&nbsp;&nbsp;
-              <Button appearance="primary" onClick={ButtonClick}>Run</Button>&nbsp;&nbsp;
-              <NestedSubmenus/>
-            </div>
-            <div style={{padding: 10, display: "flex", flexDirection: "column", verticalAlign: "top", width: '100%', backgroundColor: "lightyellow", border: "1px solid black"}}>
-              <div className={styles.icon} style={{verticalAlign: "center", display: "flex", flexDirection: "row"}}>
-                <QuestionMark aria-label="QuestionMark" {...iconStyleProps} />&nbsp;
-                <Text align="justify" style={{fontWeight: "bold"}}>Custom Expression</Text>
+        <div style={{display: "flex", width: '100%', justifyContent: "center", paddingTop: 30, paddingLeft: 20, paddingRight: 20}}>
+          <div style={{display: "block", boxSizing: "border-box", flexGrow: 1, paddingBottom: 30, maxWidth:'1280px'}}>
+              <h1>SLOP Playground</h1>
+              <div style={{paddingBottom: 10}}>
+                <Text align="justify">Below you can run expressions using <font color="blue">SLOP 1.35</font>. Define your own or select one of the pre-configured examples</Text>
               </div>
-              <div>
+              <div style={{height: 2, backgroundColor: "darkblue"}}></div>
+              <div style={{height: 10}}/>
+              <form>
+                <div style={{display: "flex", width: '100%', marginBottom: 10}}>
+                  <Appearance onChange={handleExpressionChange}/>&nbsp;&nbsp;
+                  <Button appearance="primary" onClick={ButtonClick} icon={<RunExpression/>}>Run</Button>&nbsp;&nbsp;
+                  <NestedSubmenus onChange={handlePayloadChange} />
+                </div>
+                <div style={{padding: 10, display: "flex", flexDirection: "column", verticalAlign: "top", width: '100%', backgroundColor: "lightyellow", border: "1px solid black"}}>
+                  <div className={styles.icon} style={{verticalAlign: "center", display: "flex", flexDirection: "row"}}>
+                    <QuestionMark aria-label="QuestionMark" {...iconStyleProps} />&nbsp;
+                    <Text align="justify" style={{fontWeight: "bold"}}>Custom Expression</Text>
+                  </div>
+                  <div>
+                    <Text align="justify">
+                      In this mode you can define your own expressions and customise the objects within the context. Alternatively
+                      you can try out some of the examples by clicking the "Examples" button and selecting from one of the pre-defined
+                      scenarios available.
+                    </Text>
+                  </div>
+                </div>
+                <div style={{height: 5}}/>
+                <WithPanels />
+              </form>
+              <div style={{height: 10}}/>
+              <div style={{borderTop: "2px solid black", borderLeft: "2px solid black", borderRight: "2px solid black", height: 25, paddingLeft: 5, backgroundColor: "gray"}}>
+                <Text style={{color: "white"}}>Output - <font color="yellow">Click run to begin</font></Text>
+              </div>
+              <div style={{borderStyle: "solid", borderWidth: "2px", padding: 3, minHeight: 100, backgroundColor: "#EAEAEA"}}>
                 <Text align="justify">
-                  In this mode you can define your own expressions and customise the objects within the context. Alternatively
-                  you can try out some of the examples by clicking the "Examples" button and selecting from one of the pre-defined
-                  scenarios available.
+                  {apiResponse}
                 </Text>
               </div>
-            </div>
-            <WithPanels />
-          </form>
-          <div style={{height: 10}}/>
-          <div style={{borderTop: "2px solid black", borderLeft: "2px solid black", borderRight: "2px solid black", height: 25, paddingLeft: 5, backgroundColor: "gray"}}>
-            <Text style={{color: "white"}}>Result</Text>
           </div>
-          <div style={{borderStyle: "solid", borderWidth: "2px", padding: 3, minHeight: 100, backgroundColor: "lightgrey"}}>
-            <Text align="justify">
-              {apiResponse}
-            </Text>
-          </div>
-      </div>
-    </div>
-        </FluentProvider>
+        </div>
+      </FluentProvider>
   );
 };
 

@@ -1,11 +1,9 @@
 import {
     makeStyles,
-    mergeClasses,
     shorthands,
     tokens,
     useId,
     Input,
-    Label,
 } from "@fluentui/react-components";
 import * as React from "react";
 const useStyles = makeStyles({
@@ -20,10 +18,11 @@ const useStyles = makeStyles({
         ...shorthands.padding(tokens.spacingHorizontalMNudge),
     },
 });
-export const Appearance = () => {
+export const Appearance = ({onChange}) => {
     const outlineId = useId("input-outline");
     const styles = useStyles();
+
     return (
-        <Input appearance="outline" id={outlineId} placeholder="Type expression here..." style={{width: '100%'}} />
+        <Input appearance="outline" id={outlineId} placeholder="Type expression here..." style={{width: '100%'}} onChange={onChange} />
     );
 };
