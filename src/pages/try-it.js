@@ -5,14 +5,19 @@ import {
   FluentProvider,
   teamsLightTheme,
   Text,
-  Button,
+  Button, Image, makeStyles,
 } from '@fluentui/react-components';
+import {
+  BookQuestionMark20Regular,
+  BookQuestionMark20Filled,
+  bundleIcon,
+  iconFilledClassName,
+  iconRegularClassName
+} from "@fluentui/react-icons";
 
-import {Input} from "reactstrap";
 import {WithPanels} from "../components/TabbedCode";
 import {Appearance} from "../components/Appearance";
 import {NestedSubmenus} from "../components/Menu";
-import styles from "../components/HomepageFeatures.module.css";
 
 const addRecordEndpoint = "https://1345-18-170-107-134.eu.ngrok.io/api/v1/request";
 
@@ -76,6 +81,26 @@ const sampleJson = {
   ]
 };
 
+const iconStyleProps = {
+  primaryFill: "purple",
+  className: "iconClass"
+};
+
+const useIconStyles = makeStyles({
+  icon: {
+    ":hover": {
+      [`& .${iconFilledClassName}`]: {
+        display: "none"
+      },
+      [`& .${iconRegularClassName}`]: {
+        display: "inline"
+      }
+    }
+  }
+})
+
+export const QuestionMark = bundleIcon(BookQuestionMark20Filled, BookQuestionMark20Regular);
+
 function RenderResult() {
   const inputProps = useInput();
   const [apiResponse, setApiResponse] = useState("> ");
@@ -100,25 +125,41 @@ function RenderResult() {
       );
   }
 
+  const styles = useIconStyles();
   return (
       <FluentProvider theme={teamsLightTheme}>
     <div style={{display: "flex", width: '100%', justifyContent: "center", paddingTop: 30, paddingLeft: 20, paddingRight: 20}}>
       <div style={{display: "block", boxSizing: "border-box", flexGrow: 1, paddingBottom: 30, maxWidth:'1280px'}}>
-          <h1>Try it for yourself!</h1>
+          <h1>SLOP Playground</h1>
+          <div style={{paddingBottom: 10}}>
+            <Text align="justify">Below you can run expressions using version 1.35 of SLOP. Define your own or select one of the pre-configured examples:</Text>
+          </div>
           <form>
             <div style={{display: "flex", width: '100%', marginBottom: 10}}>
               <Appearance/>&nbsp;&nbsp;
               <Button appearance="primary" onClick={ButtonClick}>Run</Button>&nbsp;&nbsp;
               <NestedSubmenus/>
             </div>
-            <div style={{padding: 10, display: "flex", flexDirection: "column", verticalAlign: "top", width: '100%', height: 100, backgroundColor: "lightyellow", borderStyle: "solid", borderColor: "black"}}>
-              <Text align="justify" style={{fontWeight: "bold"}}>Some Information</Text>
-              <Text align="justify">About something...</Text>
+            <div style={{padding: 10, display: "flex", flexDirection: "column", verticalAlign: "top", width: '100%', backgroundColor: "lightyellow", border: "1px solid black"}}>
+              <div className={styles.icon} style={{verticalAlign: "center", display: "flex", flexDirection: "row"}}>
+                <QuestionMark aria-label="QuestionMark" {...iconStyleProps} />&nbsp;
+                <Text align="justify" style={{fontWeight: "bold"}}>Custom Expression</Text>
+              </div>
+              <div>
+                <Text align="justify">
+                  In this mode you can define your own expressions and customise the objects within the context. Alternatively
+                  you can try out some of the examples by clicking the "Examples" button and selecting from one of the pre-defined
+                  scenarios available.
+                </Text>
+              </div>
             </div>
             <WithPanels />
           </form>
           <div style={{height: 10}}/>
-          <div style={{borderStyle: "dashed", padding: 5, minHeight: 100, backgroundColor: "lightgrey"}}>
+          <div style={{borderTop: "2px solid black", borderLeft: "2px solid black", borderRight: "2px solid black", height: 25, paddingLeft: 5, backgroundColor: "gray"}}>
+            <Text style={{color: "white"}}>Result</Text>
+          </div>
+          <div style={{borderStyle: "solid", borderWidth: "2px", padding: 3, minHeight: 100, backgroundColor: "lightgrey"}}>
             <Text align="justify">
               {apiResponse}
             </Text>

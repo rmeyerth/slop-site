@@ -97,7 +97,7 @@ export const WithPanels = () => {
         <div className={styles.root}>
             <TabList selectedValue={selectedValue} onTabSelect={onTabSelect} style={{minWidth: '100%'}}>
                 <div style={{paddingTop: '10px'}}>
-                    <Text style={{fontWeight: "bold"}}>Context Objects:&nbsp;&nbsp;&nbsp;</Text>
+                    <Text style={{fontWeight: "bold"}}>Context:&nbsp;&nbsp;&nbsp;</Text>
                     <Button appearance="primary">Add</Button>
                 </div>
                 <Tab id="acme" icon={<CalendarAgenda/>} value="acme">
