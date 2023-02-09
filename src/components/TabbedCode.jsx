@@ -21,6 +21,7 @@ import {
 } from "@fluentui/react-icons";
 import {useState} from "react";
 import PayloadTab from "./PayloadTab";
+import VariablesTab from "./VariablesTab";
 const CalendarAgenda = bundleIcon(CalendarAgendaFilled, CalendarAgendaRegular);
 const BookNumber = bundleIcon(BookNumber20Filled, BookNumber20Regular);
 const useStyles = makeStyles({
@@ -76,12 +77,13 @@ export const AddContext = bundleIcon(Add20Filled, Add20Regular);
 export const DeleteContext = bundleIcon(Subtract20Filled, Subtract20Regular);
 
 class TabContent {
-    constructor(inRef,name,comp,content,disabled) {
+    constructor(inRef,name,comp,content,disabled,json) {
         this.ref = inRef;
         this.name = name;
         this.icon = comp;
         this.content = content;
         this.disabled = disabled;
+        this.json = json;
     }
 }
 
@@ -89,34 +91,40 @@ export const WithPanels = ({onChange}) => {
     const styles = useStyles();
     const [selectedValue, setSelectedValue] = useState("acme");
     const [reload, setReload] = useState(1);
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState(1);
 
     const onTabSelect = (event, data) => {
         console.log("Selected " + data.value);
         setSelectedValue(data.value);
     };
 
+    const onLocalChange = (event) => {
+        const index = tabs.indexOf(tabs.filter((item) => item.ref === event.ref).at(0));
+        tabs.at(index).json = event.json;
+        setReload(p => p+1);
+    };
+
     const Payload = ({keyValue, json, onChange}) => {
         return (
-            <PayloadTab key={keyValue} json={json} onChange={onChange} />
+            <PayloadTab key={keyValue} json={json} onChange={onLocalChange} />
         );
     }
 
     const Variables = ({keyValue}) => {
         return (
-            <PayloadTab key={keyValue} />
+            <VariablesTab key={keyValue} />
         );
     }
 
     const [tabs, setTabs] = useState([
         new TabContent("variables", "Variables", <BookNumber/>, <Variables key='variables' />, true),
-        new TabContent("acme", "Acme", <CalendarAgenda/>, <Payload key='acme' json={sampleJson} onChange={onChange} />, false),
+        new TabContent("acme", "Acme", <CalendarAgenda/>, <Payload key='acme' json={sampleJson} onChange={onChange} />, false, {sampleJson}),
     ]);
 
     function handleAddClick() {
         setCount(c => c + 1);
-        const name = "Tab" + count;
-        tabs.push(new TabContent(name.toLowerCase(), name, <CalendarAgenda/>, <Payload key={name} json={{myField: 'aValue'}} onChange={onChange} />, false));
+        const name = "Object" + count;
+        tabs.push(new TabContent(name.toLowerCase(), name, <CalendarAgenda/>, <Payload key={name} json={{myField: 'aValue'}} onChange={onChange} />, false, {myField: 'aValue'}));
         setTabs(tabs);
         setReload(p => p+1);
     }
@@ -163,7 +171,6 @@ export const WithPanels = ({onChange}) => {
         const showTab = tabs.filter(refContent => refContent.ref === selectedValue).map((refContent) =>
             refContent.content
         );
-        console.log(tabs);
         return (
             <div className={styles.panels}>
                 {showTab}
