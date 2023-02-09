@@ -7,55 +7,76 @@ import {
     MenuPopover,
 } from "@fluentui/react-components";
 import * as React from "react";
-const EditorLayoutSubMenu = () => {
+const NewFeaturesSubMenu = () => {
     return (
         <Menu>
             <MenuTrigger disableButtonEnhancement>
-                <MenuItem>Editor Layout</MenuItem>
+                <MenuItem>New Features</MenuItem>
             </MenuTrigger>
 
             <MenuPopover>
                 <MenuList>
-                    <MenuItem>Split Up</MenuItem>
-                    <MenuItem>Split Down</MenuItem>
-                    <MenuItem>Single</MenuItem>
+                    <MenuItem>Variables</MenuItem>
+                    <MenuItem>Collection Filters</MenuItem>
+                    <MenuItem disabled>Static Referencing</MenuItem>
+                    <MenuItem>Unary Operator</MenuItem>
+                    <MenuItem>Syntax Validation</MenuItem>
                 </MenuList>
             </MenuPopover>
         </Menu>
     );
 };
-const AppearanceSubMenu = () => {
+const FunctionsSubMenu = () => {
     return (
         <Menu>
             <MenuTrigger disableButtonEnhancement>
-                <MenuItem>Appearance</MenuItem>
+                <MenuItem>Functions</MenuItem>
             </MenuTrigger>
 
             <MenuPopover>
                 <MenuList>
-                    <MenuItem>Centered Layout</MenuItem>
-                    <MenuItem>Zen</MenuItem>
-                    <MenuItem disabled>Zoom In</MenuItem>
-                    <MenuItem>Zoom Out</MenuItem>
+                    <MenuItem>Date</MenuItem>
+                    <MenuItem>Random</MenuItem>
+                    <MenuItem>Sum</MenuItem>
                 </MenuList>
             </MenuPopover>
         </Menu>
     );
 };
-const PreferencesSubMenu = () => {
+const StatementsSubMenu = () => {
     return (
         <Menu>
             <MenuTrigger disableButtonEnhancement>
-                <MenuItem>Preferences</MenuItem>
+                <MenuItem>Statements</MenuItem>
             </MenuTrigger>
 
             <MenuPopover>
                 <MenuList>
-                    <MenuItem>Settings</MenuItem>
-                    <MenuItem>Online Services Settings</MenuItem>
-                    <MenuItem>Extensions</MenuItem>
-                    <AppearanceSubMenu />
-                    <EditorLayoutSubMenu />
+                    <MenuItem>Conditional</MenuItem>
+                    <MenuItem>Operation</MenuItem>
+                    <MenuItem>Repeat</MenuItem>
+                    <MenuItem>Foreach</MenuItem>
+                    <MenuItem>Switch</MenuItem>
+                    <MenuItem>Field</MenuItem>
+                    <MenuItem>Variables</MenuItem>
+                </MenuList>
+            </MenuPopover>
+        </Menu>
+    );
+};
+const LiteralsSubMenu = () => {
+    return (
+        <Menu>
+            <MenuTrigger disableButtonEnhancement>
+                <MenuItem>Literals</MenuItem>
+            </MenuTrigger>
+
+            <MenuPopover>
+                <MenuList>
+                    <MenuItem>Strings</MenuItem>
+                    <MenuItem>Integers</MenuItem>
+                    <MenuItem>Booleans</MenuItem>
+                    <MenuItem>Arrays</MenuItem>
                 </MenuList>
             </MenuPopover>
         </Menu>
@@ -70,11 +91,10 @@ export const NestedSubmenus = () => {
 
             <MenuPopover>
                 <MenuList>
-                    <MenuItem>New </MenuItem>
-                    <MenuItem>New Window</MenuItem>
-                    <MenuItem disabled>Open File</MenuItem>
-                    <MenuItem>Open Folder</MenuItem>
-                    <PreferencesSubMenu />
+                    <LiteralsSubMenu />
+                    <StatementsSubMenu />
+                    <FunctionsSubMenu />
+                    <NewFeaturesSubMenu />
                 </MenuList>
             </MenuPopover>
         </Menu>

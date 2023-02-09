@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import Layout from '@theme/Layout';
 import {
   FluentProvider,
@@ -111,10 +111,6 @@ function RenderResult() {
     setExpressionValue(event.target.value);
   }
 
-  function handlePayloadChange(event) {
-    setContextValue(event.json);
-  }
-
   function ButtonClick() {
     addNewRecord(expressionValue, contextValue)
       .then(response => {
@@ -131,7 +127,7 @@ function RenderResult() {
           <div style={{display: "block", boxSizing: "border-box", flexGrow: 1, paddingBottom: 30, maxWidth:'1280px'}}>
               <h1>SLOP Playground</h1>
               <div style={{paddingBottom: 10}}>
-                <Text align="justify">Below you can run expressions using <font color="blue">SLOP 1.35</font>. Define your own or select one of the pre-configured examples</Text>
+                <Text align="justify">Below you can evaluate expressions using <font color="blue">SLOP 1.35</font>. Define your own or select one of the pre-configured examples.</Text>
               </div>
               <div style={{height: 2, backgroundColor: "darkblue"}}></div>
               <div style={{height: 10}}/>
@@ -139,9 +135,9 @@ function RenderResult() {
                 <div style={{display: "flex", width: '100%', marginBottom: 10}}>
                   <Appearance onChange={handleExpressionChange}/>&nbsp;&nbsp;
                   <Button appearance="primary" onClick={ButtonClick} icon={<RunExpression/>}>Run</Button>&nbsp;&nbsp;
-                  <NestedSubmenus onChange={handlePayloadChange} />
+                  <NestedSubmenus />
                 </div>
-                <div style={{padding: 10, display: "flex", flexDirection: "column", verticalAlign: "top", width: '100%', backgroundColor: "lightyellow", border: "1px solid black"}}>
+                <div style={{padding: 10, display: "flex", flexDirection: "column", verticalAlign: "top", width: '100%', backgroundColor: "#eff8fc", border: "1px solid black"}}>
                   <div className={styles.icon} style={{verticalAlign: "center", display: "flex", flexDirection: "row"}}>
                     <QuestionMark aria-label="QuestionMark" {...iconStyleProps} />&nbsp;
                     <Text align="justify" style={{fontWeight: "bold"}}>Custom Expression</Text>
@@ -155,7 +151,7 @@ function RenderResult() {
                   </div>
                 </div>
                 <div style={{height: 5}}/>
-                <WithPanels />
+                <WithPanels onChange={(event) => setContextValue(event.json) } />
               </form>
               <div style={{height: 10}}/>
               <div style={{borderTop: "2px solid black", borderLeft: "2px solid black", borderRight: "2px solid black", height: 25, paddingLeft: 5, backgroundColor: "gray"}}>
