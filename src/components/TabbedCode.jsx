@@ -51,7 +51,7 @@ const useStyles = makeStyles({
     }
 });
 
-const sampleJson = {
+const sampleJson = `{
     "name": "Acme Corp",
     "employees": [
         {
@@ -71,17 +71,16 @@ const sampleJson = {
             "age": 25
         }
     ]
-};
+}`;
 
 export const AddContext = bundleIcon(Add20Filled, Add20Regular);
 export const DeleteContext = bundleIcon(Subtract20Filled, Subtract20Regular);
 
 class TabContent {
-    constructor(inRef,name,comp,content,disabled,json) {
+    constructor(inRef,name,comp,disabled,json) {
         this.ref = inRef;
         this.name = name;
         this.icon = comp;
-        this.content = content;
         this.disabled = disabled;
         this.json = json;
     }
@@ -98,33 +97,25 @@ export const WithPanels = ({onChange}) => {
         setSelectedValue(data.value);
     };
 
-    const onLocalChange = (event) => {
-        const index = tabs.indexOf(tabs.filter((item) => item.ref === event.ref).at(0));
-        tabs.at(index).json = event.json;
+    const onLocalChange = (event, ref) => {
+        const found = tabs.filter(item => item.ref === ref).map(tab => tab);
+        const instance = found.at(0);
+        console.log("Updating: " + instance);
+        instance.json = event.json;
+        console.log(ref + " vs " + instance.ref);
+        console.log("Updated state for " + ref + " with " + instance.json);
         setReload(p => p+1);
     };
 
-    const Payload = ({keyValue, json, onChange}) => {
-        return (
-            <PayloadTab key={keyValue} json={json} onChange={onLocalChange} />
-        );
-    }
-
-    const Variables = ({keyValue}) => {
-        return (
-            <VariablesTab key={keyValue} />
-        );
-    }
-
     const [tabs, setTabs] = useState([
-        new TabContent("variables", "Variables", <BookNumber/>, <Variables key='variables' />, true),
-        new TabContent("acme", "Acme", <CalendarAgenda/>, <Payload key='acme' json={sampleJson} onChange={onChange} />, false, {sampleJson}),
+        new TabContent("variables", "Variables", <BookNumber/>, true),
+        new TabContent("acme", "Acme", <CalendarAgenda/>,false, sampleJson),
     ]);
 
     function handleAddClick() {
         setCount(c => c + 1);
         const name = "Object" + count;
-        tabs.push(new TabContent(name.toLowerCase(), name, <CalendarAgenda/>, <Payload key={name} json={{myField: 'aValue'}} onChange={onChange} />, false, {myField: 'aValue'}));
+        tabs.push(new TabContent(name.toLowerCase(), name, <CalendarAgenda/>, false, `{"myField": "aValue"}`));
         setTabs(tabs);
         setReload(p => p+1);
     }
@@ -168,12 +159,17 @@ export const WithPanels = ({onChange}) => {
     }
 
     function PrintSelectionCriteria() {
-        const showTab = tabs.filter(refContent => refContent.ref === selectedValue).map((refContent) =>
-            refContent.content
+        console.log("Selected tab: " + selectedValue);
+        const template = tabs.filter(refContent => refContent.ref === selectedValue).map((refContent) =>
+            refContent
         );
+        const instance = template.at(0);
+        const ref = instance.ref;
+        console.log("Ref: " + ref);
+        //const instance = template.at(0);
         return (
             <div className={styles.panels}>
-                {showTab}
+                <PayloadTab keyValue={ref} json={instance.json} onChange={onLocalChange} />
             </div>
         );
     }

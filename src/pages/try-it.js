@@ -140,11 +140,11 @@ function RenderResult() {
                 <div style={{padding: 10, display: "flex", flexDirection: "column", verticalAlign: "top", width: '100%', backgroundColor: "#eff8fc", border: "1px solid black"}}>
                   <div className={styles.icon} style={{verticalAlign: "center", display: "flex", flexDirection: "row"}}>
                     <QuestionMark aria-label="QuestionMark" {...iconStyleProps} />&nbsp;
-                    <Text align="justify" style={{fontWeight: "bold"}}>Custom Expression</Text>
+                    <Text align="justify" style={{fontWeight: "bold"}}>Custom Expression Mode</Text>
                   </div>
                   <div>
                     <Text align="justify">
-                      In this mode you can define your own expressions and customise the objects within the context. Alternatively
+                      Here you can define your own expressions and customise the objects and variables within the context. Alternatively
                       you can try out some of the examples by clicking the "Examples" button and selecting from one of the pre-defined
                       scenarios available.
                     </Text>
