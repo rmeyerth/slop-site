@@ -6,7 +6,12 @@ import {
     Tab,
     Text,
     TabList,
-    Button, Popover, PopoverTrigger, PopoverSurface,
+    Button,
+    Popover,
+    PopoverTrigger,
+    PopoverSurface,
+    Label,
+    Combobox, Input
 } from "@fluentui/react-components";
 import {
     bundleIcon,
@@ -87,14 +92,6 @@ class TabContent {
     }
 }
 
-const useLayoutStyles = makeStyles({
-    root: {
-        display: "flex",
-        flexDirection: "column",
-        rowGap: tokens.spacingVerticalMNudge,
-    },
-});
-
 export const WithPanels = ({onChange}) => {
     const styles = useStyles();
     const [selectedValue, setSelectedValue] = useState("acme");
@@ -142,30 +139,40 @@ export const WithPanels = ({onChange}) => {
         }
     }
 
+    function handleCancelVariable() {
+        //try and focus on something else
+    }
+
     const ExampleContent = () => {
-        const styles = useStyles();
         return (
             <div>
-                <h3 className={styles.contentHeader}>Popover content</h3>
-
-                <div>This is some popover content</div>
+                <h3 style={{paddingBottom: 3, borderBottom: '1px solid gray'}}>Add Variable</h3>
+                <div style={{paddingTop: 0}}>
+                    <div style={{paddingBottom: 5, width: '100%', display: "flex", flexDirection: "row"}}><Label style={{minWidth: 100}}>Name:&nbsp;</Label><Input style={{minWidth: 250}} /></div>
+                    <div style={{paddingBottom: 5, display: "flex", flexDirection: "row"}}>
+                        <Label style={{minWidth: 100}}>Type:&nbsp;</Label><Combobox style={{minWidth: 250}}></Combobox>
+                    </div>
+                    <div style={{paddingBottom: 15, display: "flex", flexDirection: "row"}}><Label style={{minWidth: 100}}>Value:&nbsp;</Label><Input style={{minWidth: 250}} /></div>
+                    <div style={{paddingBottom: 5, display: "content", textAlign: "right"}}>
+                        <Button style={{alignSelf: "end"}} appearance="primary" >Add</Button>&nbsp;&nbsp;<Button style={{alignSelf: "end"}} appearance="primary" onClick={handleCancelVariable}>Cancel</Button>
+                    </div>
+                </div>
             </div>
         );
     };
 
     function ContextButtons() {
         const addVariable = selectedValue === 'variables';
-        const layoutStyles = useLayoutStyles();
         return (
             <div style={{paddingTop: '10px', minWidth: "fit-content"}}>
                 <Text style={{fontWeight: "bold"}}>Context:&nbsp;&nbsp;&nbsp;</Text>
                 {addVariable ?
-                        <Popover trapFocus appearance="brand">
+                        <Popover trapFocus positioning={"below-start"}>
                             <PopoverTrigger disableButtonEnhancement>
-                                <Button appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddVariable}></Button>
+                                <Button id="addVar" appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddVariable}></Button>
                             </PopoverTrigger>
 
-                            <PopoverSurface>
+                            <PopoverSurface style={{border: "1px solid black"}}>
                                 <ExampleContent />
                             </PopoverSurface>
                         </Popover>
