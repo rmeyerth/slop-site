@@ -17,7 +17,13 @@ const PayloadBody = ({keyValue, json, onChange}) => {
     }
 
     function onLocalChange(event) {
-        if (!payloadSet) {
+        let valid = true;
+        try {
+            JSON.parse(event.json);
+        } catch (e) {
+            valid = false;
+        }
+        if (!payloadSet && valid) {
             onChange(event, ref);
         }
     }

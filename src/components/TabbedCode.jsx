@@ -77,12 +77,13 @@ export const AddContext = bundleIcon(Add20Filled, Add20Regular);
 export const DeleteContext = bundleIcon(Subtract20Filled, Subtract20Regular);
 
 class TabContent {
-    constructor(inRef,name,comp,disabled,json) {
+    constructor(inRef,name,comp,disabled,json,isVariable) {
         this.ref = inRef;
         this.name = name;
         this.icon = comp;
         this.disabled = disabled;
         this.json = json;
+        this.isVariable = isVariable;
     }
 }
 
@@ -108,14 +109,14 @@ export const WithPanels = ({onChange}) => {
     };
 
     const [tabs, setTabs] = useState([
-        new TabContent("variables", "Variables", <BookNumber/>, true),
-        new TabContent("acme", "Acme", <CalendarAgenda/>,false, sampleJson),
+        new TabContent("variables", "Variables", <BookNumber/>, false, `{}`, true),
+        new TabContent("acme", "Acme", <CalendarAgenda/>,false, sampleJson, false),
     ]);
 
     function handleAddClick() {
         setCount(c => c + 1);
         const name = "Object" + count;
-        tabs.push(new TabContent(name.toLowerCase(), name, <CalendarAgenda/>, false, `{"myField": "aValue"}`));
+        tabs.push(new TabContent(name.toLowerCase(), name, <CalendarAgenda/>, false, `{"myField": "aValue"}`, false));
         setTabs(tabs);
         setReload(p => p+1);
     }
@@ -165,11 +166,12 @@ export const WithPanels = ({onChange}) => {
         );
         const instance = template.at(0);
         const ref = instance.ref;
+        const isVariable = instance.isVariable;
         console.log("Ref: " + ref);
-        //const instance = template.at(0);
         return (
             <div className={styles.panels}>
-                <PayloadTab keyValue={ref} json={instance.json} onChange={onLocalChange} />
+                {Boolean(isVariable) && (<VariablesTab keyValue={ref} />)}
+                {Boolean(!isVariable) && (<PayloadTab keyValue={ref} json={instance.json} onChange={onLocalChange} />)}
             </div>
         );
     }
