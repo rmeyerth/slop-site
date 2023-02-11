@@ -154,10 +154,10 @@ function RenderResult() {
                 <WithPanels onChange={(event) => setContextValue(event.json) } />
               </form>
               <div style={{height: 10}}/>
-              <div style={{borderTop: "2px solid black", borderLeft: "2px solid black", borderRight: "2px solid black", height: 25, paddingLeft: 5, backgroundColor: "gray"}}>
+              <div style={{borderTop: "2px solid black", borderLeft: "1px solid black", borderRight: "1px solid black", height: 25, paddingLeft: 5, backgroundColor: "gray"}}>
                 <Text style={{color: "white"}}>Output - <font color="yellow">Click run to begin</font></Text>
               </div>
-              <div style={{borderStyle: "solid", borderWidth: "2px", padding: 3, minHeight: 100, backgroundColor: "#EAEAEA"}}>
+              <div style={{borderStyle: "solid", borderWidth: "1px", padding: 3, minHeight: 100, backgroundColor: "#EAEAEA"}}>
                 <Text align="justify">
                   {apiResponse}
                 </Text>
