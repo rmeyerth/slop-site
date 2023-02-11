@@ -6,7 +6,7 @@ import {
     Tab,
     Text,
     TabList,
-    Button,
+    Button, Popover, PopoverTrigger, PopoverSurface,
 } from "@fluentui/react-components";
 import {
     bundleIcon,
@@ -87,6 +87,14 @@ class TabContent {
     }
 }
 
+const useLayoutStyles = makeStyles({
+    root: {
+        display: "flex",
+        flexDirection: "column",
+        rowGap: tokens.spacingVerticalMNudge,
+    },
+});
+
 export const WithPanels = ({onChange}) => {
     const styles = useStyles();
     const [selectedValue, setSelectedValue] = useState("acme");
@@ -111,12 +119,18 @@ export const WithPanels = ({onChange}) => {
         new TabContent("acme", "Acme", <CalendarAgenda/>,false, sampleJson, false),
     ]);
 
+    function handleAddVariable() {
+        console.log("blah");
+    }
+
     function handleAddClick() {
         setCount(c => c + 1);
         const name = "Object" + count;
-        tabs.push(new TabContent(name.toLowerCase(), name, <CalendarAgenda/>, false, `{"myField": "aValue"}`, false));
+        tabs.push(new TabContent(name.toLowerCase(), name,
+            <CalendarAgenda/>, false, `{"myField": "aValue"}`, false));
+        setSelectedValue(name.toLowerCase());
         setTabs(tabs);
-        setReload(p => p+1);
+        setReload(p => p + 1);
     }
 
     function handleDeleteClick() {
@@ -128,11 +142,36 @@ export const WithPanels = ({onChange}) => {
         }
     }
 
+    const ExampleContent = () => {
+        const styles = useStyles();
+        return (
+            <div>
+                <h3 className={styles.contentHeader}>Popover content</h3>
+
+                <div>This is some popover content</div>
+            </div>
+        );
+    };
+
     function ContextButtons() {
+        const addVariable = selectedValue === 'variables';
+        const layoutStyles = useLayoutStyles();
         return (
             <div style={{paddingTop: '10px', minWidth: "fit-content"}}>
                 <Text style={{fontWeight: "bold"}}>Context:&nbsp;&nbsp;&nbsp;</Text>
-                <Button appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddClick}></Button>&nbsp;
+                {addVariable ?
+                        <Popover trapFocus appearance="brand">
+                            <PopoverTrigger disableButtonEnhancement>
+                                <Button appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddVariable}></Button>
+                            </PopoverTrigger>
+
+                            <PopoverSurface>
+                                <ExampleContent />
+                            </PopoverSurface>
+                        </Popover>
+                :
+                    <Button appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddClick}></Button>}
+                &nbsp;
                 <Button appearance="primary" style={{backgroundColor: "#800000"}} icon={<DeleteContext/>} onClick={handleDeleteClick}></Button>
             </div>
         )
