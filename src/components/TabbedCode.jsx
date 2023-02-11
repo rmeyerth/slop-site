@@ -132,7 +132,7 @@ export const WithPanels = ({onChange}) => {
 
     function ContextButtons() {
         return (
-            <div style={{paddingTop: '10px'}}>
+            <div style={{paddingTop: '10px', minWidth: "fit-content"}}>
                 <Text style={{fontWeight: "bold"}}>Context:&nbsp;&nbsp;&nbsp;</Text>
                 <Button appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddClick}></Button>&nbsp;
                 <Button appearance="primary" style={{backgroundColor: "#800000"}} icon={<DeleteContext/>} onClick={handleDeleteClick}></Button>

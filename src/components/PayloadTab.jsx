@@ -28,7 +28,7 @@ const PayloadBody = ({keyValue, json, onChange}) => {
         }
     }
     console.log("parsing: " + jsonPayload);
-    return (<div role="tabpanel" key={keyValue} aria-labelledby='payload' style={{minWidth: '100%', width: '100%'}}>
+    return (<div role="tabpanel" key={keyValue} aria-labelledby='payload' style={{minWidth: '100%', width: '100%', paddingTop: 5}}>
         <JSONInput id='author-input' height='450px' width='100%' placeholder={JSON.parse(jsonPayload)} onChange={onLocalChange}
                    locale={locale}/>
     </div>);
