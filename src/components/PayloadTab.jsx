@@ -6,7 +6,6 @@ const PayloadBody = ({keyValue, json, onChange}) => {
     const [jsonPayload, setJsonPayload] = useState("{}");
     const [ref, setRef] = useState("");
 
-    console.log("Key Value: " + keyValue);
     if (ref !== keyValue) {
         setRef(keyValue);
     }
@@ -16,7 +15,7 @@ const PayloadBody = ({keyValue, json, onChange}) => {
         payloadSet = true;
     }
 
-    function onLocalChange(event) {
+    function handleFocusLost(event) {
         let valid = true;
         try {
             JSON.parse(event.json);
@@ -27,10 +26,10 @@ const PayloadBody = ({keyValue, json, onChange}) => {
             onChange(event, ref);
         }
     }
-    console.log("parsing: " + jsonPayload);
+
     return (<div role="tabpanel" key={keyValue} aria-labelledby='payload' style={{minWidth: '100%', width: '100%', paddingTop: 5}}>
-        <JSONInput id='author-input' height='450px' width='100%' placeholder={JSON.parse(jsonPayload)} onChange={onLocalChange}
-                   locale={locale}/>
+        <JSONInput id={keyValue} height='450px' width='100%' placeholder={JSON.parse(jsonPayload)}
+                   onBlur={handleFocusLost} locale={locale}/>
     </div>);
 };
 

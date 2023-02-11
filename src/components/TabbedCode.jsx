@@ -94,18 +94,16 @@ export const WithPanels = ({onChange}) => {
     const [count, setCount] = useState(1);
 
     const onTabSelect = (event, data) => {
-        console.log("Selected " + data.value);
+        console.log("Selected on event " + data.value);
         setSelectedValue(data.value);
     };
 
     const onLocalChange = (event, ref) => {
+        console.log("Selected tab on blur: " + selectedValue);
         const found = tabs.filter(item => item.ref === ref).map(tab => tab);
         const instance = found.at(0);
-        console.log("Updating: " + instance);
+        console.log(event.target);
         instance.json = event.json;
-        console.log(ref + " vs " + instance.ref);
-        console.log("Updated state for " + ref + " with " + instance.json);
-        setReload(p => p+1);
     };
 
     const [tabs, setTabs] = useState([
@@ -160,14 +158,12 @@ export const WithPanels = ({onChange}) => {
     }
 
     function PrintSelectionCriteria() {
-        console.log("Selected tab: " + selectedValue);
         const template = tabs.filter(refContent => refContent.ref === selectedValue).map((refContent) =>
             refContent
         );
         const instance = template.at(0);
         const ref = instance.ref;
         const isVariable = instance.isVariable;
-        console.log("Ref: " + ref);
         return (
             <div className={styles.panels}>
                 {Boolean(isVariable) && (<VariablesTab keyValue={ref} />)}

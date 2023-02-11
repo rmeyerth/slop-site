@@ -110,7 +110,7 @@ const VariablesTab = ({key}) => (
             <div style={{minWidth: '100%', alignContent: "center", alignItems: "center", display: "flex", flexDirection: "column"}}>
                 <div style={{height: 20}}></div>
                 <Label style={{minWidth: '100%', textAlign: "center", fontSize: 16, fontWeight: "Bold", color: "lightgray"}}>
-                    Click add button to create a new variable
+                    Click [+] button to create a new variable
                 </Label>
             </div>
         </div>
