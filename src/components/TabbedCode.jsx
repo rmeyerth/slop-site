@@ -122,10 +122,6 @@ export const WithPanels = ({onChange}) => {
         new TabContent("acme", "Acme", <CalendarAgenda/>,false, sampleJson, false),
     ]);
 
-    function handleAddVariable() {
-        console.log("blah");
-    }
-
     function handleAddClick() {
         setCount(c => c + 1);
         const name = "Object" + count;
@@ -168,10 +164,16 @@ export const WithPanels = ({onChange}) => {
             }
         }
 
-        function handleAddVariable(event) {
-            //TODO - Needs some work on the structure
-            let localVars = variables;
-            localVars = [...{name: nameRef.current.value, type: comboRef.current.value, value: valueRef.current.value}];
+        function handleAddVariable() {
+            const localVars = variables.concat(
+                {
+                    name: nameRef.current.value,
+                    type: {
+                        icon: <BookNumber/>,
+                        label: comboRef.current.value
+                    },
+                    value: valueRef.current.value,
+                });
             setVariables(localVars)
         }
 
@@ -241,7 +243,7 @@ export const WithPanels = ({onChange}) => {
                 {isVariable ?
                         <Popover trapFocus positioning={"below-start"}>
                             <PopoverTrigger disableButtonEnhancement>
-                                <Button id="addVar" appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddVariable}></Button>
+                                <Button id="addVar" appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>}></Button>
                             </PopoverTrigger>
 
                             <PopoverSurface style={{border: "1px solid black"}}>
@@ -292,7 +294,15 @@ export const WithPanels = ({onChange}) => {
         );
     }
 
-    function PrintSelectionCriteria() {
+    function onSelectionChange(event, data) {
+        console.log(event);
+        variables.filter(aVar => !data.selectedItems.some(variables.indexOf(aVar)))
+        data.selectedItems.map(index => {
+            setVariables(variables.filter(aVar => )}));
+        variables.at(0)
+    }
+
+    function PrintSelectionCriteria({onSelectionChange}) {
         const template = tabs.filter(refContent => refContent.ref === selectedValue).map((refContent) =>
             refContent
         );
@@ -301,7 +311,7 @@ export const WithPanels = ({onChange}) => {
         const isVariable = instance.isVariable;
         return (
             <div className={styles.panels}>
-                {Boolean(isVariable) && (<VariablesTab keyValue={ref} variables={variables} />)}
+                {Boolean(isVariable) && (<VariablesTab keyValue={ref} variables={variables} onSelectionChange={onSelectionChange} />)}
                 {Boolean(!isVariable) && (<PayloadTab keyValue={ref} json={instance.json} onChange={onLocalChange} />)}
             </div>
         );
@@ -310,7 +320,7 @@ export const WithPanels = ({onChange}) => {
     return (
         <div className={styles.root}>
             {Boolean(reload) && (<PrintDynamicTabs />)}
-            {Boolean(reload) && (<PrintSelectionCriteria />)}
+            {Boolean(reload) && (<PrintSelectionCriteria onSelectionChange={onSelectionChange} />)}
         </div>
     );
 };

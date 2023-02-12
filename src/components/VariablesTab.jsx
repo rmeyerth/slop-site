@@ -6,26 +6,24 @@ import {
     DataGridHeaderCell,
     DataGridBody,
     DataGridCell,
-    createTableColumn, TableCellLayout, Avatar,
+    createTableColumn, TableCellLayout,
 } from "@fluentui/react-components";
 import {Label} from "reactstrap";
 
-function VariableTable({items}) {
+function VariableTable({items, onSelectionChange}) {
 
     const columns = [
         createTableColumn({
             columnId: "name",
             compare: (a, b) => {
-                return a.name.label.localeCompare(b.name.label);
+                return a.name.localeCompare(b.name);
             },
             renderHeaderCell: () => {
                 return "Name";
             },
             renderCell: (item) => {
                 return (
-                    <TableCellLayout media={item.name.icon}>
-                        {item.name.label}
-                    </TableCellLayout>
+                    item.name
                 );
             },
         }),
@@ -39,15 +37,7 @@ function VariableTable({items}) {
             },
             renderCell: (item) => {
                 return (
-                    <TableCellLayout
-                        media={
-                            <Avatar
-                                aria-label={item.type.label}
-                                name={item.type.label}
-                                badge={{ status: item.type.status }}
-                            />
-                        }
-                    >
+                    <TableCellLayout media={item.type.icon}>
                         {item.type.label}
                     </TableCellLayout>
                 );
@@ -56,14 +46,14 @@ function VariableTable({items}) {
         createTableColumn({
             columnId: "value",
             compare: (a, b) => {
-                return a.value.label.localeCompare(b.value.label);
+                return a.value.localeCompare(b.value);
             },
             renderHeaderCell: () => {
                 return "Value";
             },
 
             renderCell: (item) => {
-                return item.value.label;
+                return item.value;
             },
         }),
     ];
@@ -75,8 +65,17 @@ function VariableTable({items}) {
             sortable
             style={{width: '100%'}}
             selectionMode="multiselect"
-            getRowId={(item) => item.file.label}
-            onSelectionChange={(e, data) => console.log(data)}
+            getRowId={(item) => item.name.label}
+            onSelectionChange={onSelectionChange}
+            resizableColumns
+            columnSizingOptions={{
+                name: {
+                    defaultWidth: 230,
+                },
+                type: {
+                    defaultWidth: 230,
+                },
+            }}
         >
             <DataGridHeader style={{backgroundColor: "#EAEAEA"}}>
                 <DataGridRow selectionCell={{ "aria-label": "Select all rows" }}>
@@ -101,15 +100,15 @@ function VariableTable({items}) {
     );
 }
 
-const VariablesTab = ({key, variables}) => (
+const VariablesTab = ({key, variables, onSelectionChange}) => (
     <div role="tabpanel" key={key} aria-labelledby='payload' style={{minWidth: '100%', width: '100%', paddingTop: 5}}>
         <div style={{height: 450, border: '1px solid black'}}>
-            <VariableTable items={variables} />
+            <VariableTable items={variables} onSelectionChange={onSelectionChange} />
             <div style={{minWidth: '100%', alignContent: "center", alignItems: "center", display: "flex", flexDirection: "column"}}>
                 <div style={{height: 20}}></div>
-                <Label style={{minWidth: '100%', textAlign: "center", fontSize: 16, fontWeight: "Bold", color: "lightgray"}}>
+                {variables.length === 0 && (<Label style={{minWidth: '100%', textAlign: "center", fontSize: 16, fontWeight: "Bold", color: "lightgray"}}>
                     Click [+] button to create a new variable
-                </Label>
+                </Label>)}
             </div>
         </div>
     </div>
