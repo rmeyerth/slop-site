@@ -10,9 +10,7 @@ import {
 } from "@fluentui/react-components";
 import {Label} from "reactstrap";
 
-function VariableTable() {
-
-    const items = [ ];
+function VariableTable({items}) {
 
     const columns = [
         createTableColumn({
@@ -103,10 +101,10 @@ function VariableTable() {
     );
 }
 
-const VariablesTab = ({key}) => (
+const VariablesTab = ({key, variables}) => (
     <div role="tabpanel" key={key} aria-labelledby='payload' style={{minWidth: '100%', width: '100%', paddingTop: 5}}>
         <div style={{height: 450, border: '1px solid black'}}>
-            <VariableTable />
+            <VariableTable items={variables} />
             <div style={{minWidth: '100%', alignContent: "center", alignItems: "center", display: "flex", flexDirection: "column"}}>
                 <div style={{height: 20}}></div>
                 <Label style={{minWidth: '100%', textAlign: "center", fontSize: 16, fontWeight: "Bold", color: "lightgray"}}>

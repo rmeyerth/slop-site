@@ -11,7 +11,9 @@ import {
     PopoverTrigger,
     PopoverSurface,
     Label,
-    Combobox, Input
+    Combobox,
+    Input,
+    Option
 } from "@fluentui/react-components";
 import {
     bundleIcon,
@@ -22,9 +24,11 @@ import {
     Subtract20Filled,
     Subtract20Regular,
     BookNumber20Regular,
-    BookNumber20Filled
+    BookNumber20Filled,
+    Edit20Regular,
+    Edit20Filled
 } from "@fluentui/react-icons";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import PayloadTab from "./PayloadTab";
 import VariablesTab from "./VariablesTab";
 const CalendarAgenda = bundleIcon(CalendarAgendaFilled, CalendarAgendaRegular);
@@ -80,6 +84,7 @@ const sampleJson = `{
 
 export const AddContext = bundleIcon(Add20Filled, Add20Regular);
 export const DeleteContext = bundleIcon(Subtract20Filled, Subtract20Regular);
+export const EditContext = bundleIcon(Edit20Filled, Edit20Regular);
 
 class TabContent {
     constructor(inRef,name,comp,disabled,json,isVariable) {
@@ -97,6 +102,7 @@ export const WithPanels = ({onChange}) => {
     const [selectedValue, setSelectedValue] = useState("acme");
     const [reload, setReload] = useState(1);
     const [count, setCount] = useState(1);
+    const [variables, setVariables] = useState([]);
 
     const onTabSelect = (event, data) => {
         console.log("Selected on event " + data.value);
@@ -141,20 +147,85 @@ export const WithPanels = ({onChange}) => {
 
     function handleCancelVariable() {
         //try and focus on something else
+        setReload(p => p + 1);
     }
 
     const ExampleContent = () => {
+        const options = ["String", "Number", "Boolean", "Array"];
+        const comboRef = useRef(null);
+        const nameRef = useRef(null);
+        const valueRef = useRef(null);
+
+        function handleItemChange(event, data) {
+            if (data.optionText === "Array") {
+                valueRef.current.value = "[ ]";
+            } else if (data.optionText === "Number") {
+                valueRef.current.value = "0";
+            } else if (data.optionText === "Boolean") {
+                valueRef.current.value = "false";
+            } else {
+                valueRef.current.value = "";
+            }
+        }
+
+        function handleAddVariable(event) {
+            //TODO - Needs some work on the structure
+            let localVars = variables;
+            localVars = [...{name: nameRef.current.value, type: comboRef.current.value, value: valueRef.current.value}];
+            setVariables(localVars)
+        }
+
         return (
             <div>
                 <h3 style={{paddingBottom: 3, borderBottom: '1px solid gray'}}>Add Variable</h3>
                 <div style={{paddingTop: 0}}>
-                    <div style={{paddingBottom: 5, width: '100%', display: "flex", flexDirection: "row"}}><Label style={{minWidth: 100}}>Name:&nbsp;</Label><Input style={{minWidth: 250}} /></div>
-                    <div style={{paddingBottom: 5, display: "flex", flexDirection: "row"}}>
-                        <Label style={{minWidth: 100}}>Type:&nbsp;</Label><Combobox style={{minWidth: 250}}></Combobox>
+                    <div style={{paddingBottom: 5, width: '100%', display: "flex", flexDirection: "row"}}>
+                        <Label style={{minWidth: 100}}>Name:&nbsp;</Label>
+                        <Input style={{minWidth: 250}} ref={nameRef} />
                     </div>
-                    <div style={{paddingBottom: 15, display: "flex", flexDirection: "row"}}><Label style={{minWidth: 100}}>Value:&nbsp;</Label><Input style={{minWidth: 250}} /></div>
+                    <div style={{paddingBottom: 5, display: "flex", flexDirection: "row"}}>
+                        <Label style={{minWidth: 100}}>Type:&nbsp;</Label>
+                            <Combobox style={{minWidth: 250}} onOptionSelect={handleItemChange} ref={comboRef}>
+                                {options.map(item => (
+                                    <Option key={item}>
+                                        {item}
+                                    </Option>
+                                ))}
+                        </Combobox>
+                    </div>
+                    <div style={{paddingBottom: 15, display: "flex", flexDirection: "row"}}>
+                        <Label style={{minWidth: 100}}>Value:&nbsp;</Label>
+                        <Input style={{minWidth: 250}} ref={valueRef} />
+                    </div>
                     <div style={{paddingBottom: 5, display: "content", textAlign: "right"}}>
-                        <Button style={{alignSelf: "end"}} appearance="primary" >Add</Button>&nbsp;&nbsp;<Button style={{alignSelf: "end"}} appearance="primary" onClick={handleCancelVariable}>Cancel</Button>
+                        <Button style={{alignSelf: "end"}} appearance="primary" onClick={handleCancelVariable}>Cancel</Button>&nbsp;&nbsp;
+                        <Button style={{alignSelf: "end"}} appearance="primary" onClick={handleAddVariable}>Add</Button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const EditObject = () => {
+
+        function onSubmit() {
+            const found = tabs.filter(item => item.ref === selectedValue).map(tab => tab);
+            found.at(0).name = document.getElementById("editVar").value;
+            console.log(found.at(0).name);
+            setReload(p => p + 1);
+        }
+
+        return (
+            <div>
+                <h3 style={{paddingBottom: 3, borderBottom: '1px solid gray'}}>Edit Object</h3>
+                <div style={{paddingTop: 0}}>
+                    <div style={{paddingBottom: 5, width: '100%', display: "flex", flexDirection: "row"}}>
+                        <Label style={{minWidth: 100}}>Name:&nbsp;</Label>
+                        <Input id="editVar" style={{minWidth: 250}} />
+                    </div>
+                    <div style={{paddingBottom: 5, display: "content", textAlign: "right"}}>
+                        <Button style={{alignSelf: "end"}} appearance="primary" onClick={handleCancelVariable}>Cancel</Button>&nbsp;&nbsp;
+                        <Button style={{alignSelf: "end"}} appearance="primary" onClick={onSubmit}>Apply</Button>
                     </div>
                 </div>
             </div>
@@ -162,11 +233,12 @@ export const WithPanels = ({onChange}) => {
     };
 
     function ContextButtons() {
-        const addVariable = selectedValue === 'variables';
+        const isVariable = selectedValue === 'variables';
+        const hasVariables = variables.length !== 0;
         return (
             <div style={{paddingTop: '10px', minWidth: "fit-content"}}>
                 <Text style={{fontWeight: "bold"}}>Context:&nbsp;&nbsp;&nbsp;</Text>
-                {addVariable ?
+                {isVariable ?
                         <Popover trapFocus positioning={"below-start"}>
                             <PopoverTrigger disableButtonEnhancement>
                                 <Button id="addVar" appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddVariable}></Button>
@@ -177,7 +249,24 @@ export const WithPanels = ({onChange}) => {
                             </PopoverSurface>
                         </Popover>
                 :
-                    <Button appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddClick}></Button>}
+                    <Button appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddClick} ></Button>}
+                &nbsp;
+                {isVariable ?
+                        hasVariables ?
+                            <Button appearance="primary" style={{backgroundColor: "#54A3C4"}} icon={<EditContext/>}></Button>
+                        :
+                            <Button appearance="primary" style={{backgroundColor: "#54A3C4"}} icon={<EditContext/>} disabled></Button>
+                    :
+                        <Popover trapFocus positioning={"below-start"}>
+                            <PopoverTrigger disableButtonEnhancement>
+                                <Button appearance="primary" style={{backgroundColor: "#54A3C4"}} icon={<EditContext/>}></Button>
+                            </PopoverTrigger>
+
+                            <PopoverSurface style={{border: "1px solid black"}}>
+                                <EditObject />
+                            </PopoverSurface>
+                        </Popover>
+                }
                 &nbsp;
                 <Button appearance="primary" style={{backgroundColor: "#800000"}} icon={<DeleteContext/>} onClick={handleDeleteClick}></Button>
             </div>
@@ -187,11 +276,11 @@ export const WithPanels = ({onChange}) => {
     function PrintDynamicTabs() {
         const renderTabs = tabs.map((tab) =>
             tab.disabled ?
-                <Tab id={tab.ref} key={tab.ref} icon={<BookNumber/>} value={tab.ref} style={{paddingTop: 14, paddingBottom: 8}} disabled>
+                <Tab id={tab.ref} key={tab.ref} icon={tab.icon} value={tab.ref} style={{paddingTop: 14, paddingBottom: 8}} disabled>
                     {tab.name}
                 </Tab>
             :
-                <Tab id={tab.ref} key={tab.ref} icon={<BookNumber/>} value={tab.ref} style={{paddingTop: 14, paddingBottom: 8}}>
+                <Tab id={tab.ref} key={tab.ref} icon={tab.icon} value={tab.ref} style={{paddingTop: 14, paddingBottom: 8}}>
                     {tab.name}
                 </Tab>
         )
@@ -212,7 +301,7 @@ export const WithPanels = ({onChange}) => {
         const isVariable = instance.isVariable;
         return (
             <div className={styles.panels}>
-                {Boolean(isVariable) && (<VariablesTab keyValue={ref} />)}
+                {Boolean(isVariable) && (<VariablesTab keyValue={ref} variables={variables} />)}
                 {Boolean(!isVariable) && (<PayloadTab keyValue={ref} json={instance.json} onChange={onLocalChange} />)}
             </div>
         );
@@ -220,8 +309,8 @@ export const WithPanels = ({onChange}) => {
 
     return (
         <div className={styles.root}>
-            {Boolean(reload) && (<PrintDynamicTabs/>)}
-            {Boolean(reload) && (<PrintSelectionCriteria/>)}
+            {Boolean(reload) && (<PrintDynamicTabs />)}
+            {Boolean(reload) && (<PrintSelectionCriteria />)}
         </div>
     );
 };

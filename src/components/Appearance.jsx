@@ -20,7 +20,6 @@ const useStyles = makeStyles({
 });
 export const Appearance = ({onChange}) => {
     const outlineId = useId("input-outline");
-    const styles = useStyles();
 
     return (
         <Input appearance="outline" id={outlineId} placeholder="Type expression here..." style={{width: '100%'}} onChange={onChange} />
