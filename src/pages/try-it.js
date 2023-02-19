@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext, useEffect, useRef} from 'react';
 import Layout from '@theme/Layout';
 import {
   FluentProvider,
@@ -26,17 +26,6 @@ Button.defaultProps = {
   theme: "blue"
 }
 
-function useInput(defaultValue) {
-  const [value, setValue] = useState(defaultValue);
-  function onChange(e) {
-    setValue(e.target.value);
-  }
-  return {
-    value,
-    onChange,
-  };
-}
-
 const addNewRecord = async (expression, payload) => {
   const RecordBodyParameters = {
     'expression': expression,
@@ -55,7 +44,6 @@ const addNewRecord = async (expression, payload) => {
 
   const response = await fetch(runExpressionEndpoint, options);
   const jsonResponse = await response.text();
-  console.log(JSON.stringify(jsonResponse));
   return jsonResponse;
 };
 
@@ -106,18 +94,37 @@ function RenderResult() {
   const [apiResponse, setApiResponse] = useState("> ");
   const [expressionValue, setExpressionValue] = useState("");
   const [contextValue, setContextValue] = useState(JSON.stringify(sampleJson));
+  const [state, setState] = useState({});
 
   function handleExpressionChange(event) {
     setExpressionValue(event.target.value);
   }
 
-  function ButtonClick() {
+  function handleButtonClick() {
     addNewRecord(expressionValue, contextValue)
       .then(response => {
-          console.log(response);
           setApiResponse('> ' + response);
         }
       );
+  }
+
+  function handleOnChange(inVars, tabs) {
+    console.log(inVars);
+    console.log(tabs);
+    const value = {
+      expression: expressionValue,
+      variables: inVars.map(aVar => {
+        return ({
+          [aVar.name]: aVar.value
+        });
+      }),
+      objects: tabs.filter(tab => tab.ref !== "variables").map(tab => {
+        return ({
+          [tab.name]: JSON.parse(tab.json)
+        });
+      })
+    };
+    console.log(JSON.stringify(value));
   }
 
   const styles = useIconStyles();
@@ -134,7 +141,7 @@ function RenderResult() {
               <form>
                 <div style={{display: "flex", width: '100%', marginBottom: 10}}>
                   <Appearance onChange={handleExpressionChange}/>&nbsp;&nbsp;
-                  <Button appearance="primary" onClick={ButtonClick} icon={<RunExpression/>}>Run</Button>&nbsp;&nbsp;
+                  <Button appearance="primary" onClick={handleButtonClick} icon={<RunExpression/>}>Run</Button>&nbsp;&nbsp;
                   <NestedSubmenus />
                 </div>
                 <div style={{padding: 10, display: "flex", flexDirection: "column", verticalAlign: "top", width: '100%', backgroundColor: "#eff8fc", border: "1px solid black"}}>
@@ -151,7 +158,7 @@ function RenderResult() {
                   </div>
                 </div>
                 <div style={{height: 5}}/>
-                <WithPanels onChange={(event) => setContextValue(event.json) } />
+                <WithPanels onChange={handleOnChange} />
               </form>
               <div style={{height: 10}}/>
               <div style={{borderTop: "1px solid black", borderLeft: "1px solid black", borderRight: "1px solid black", height: 30, paddingLeft: 10, paddingTop: 3, backgroundColor: "#A9A8A8"}}>

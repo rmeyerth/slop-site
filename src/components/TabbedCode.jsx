@@ -106,16 +106,14 @@ export const WithPanels = ({onChange}) => {
     const [selectedItems, setSelectedItems] = useState(new Set());
 
     const onTabSelect = (event, data) => {
-        console.log("Selected on event " + data.value);
         setSelectedValue(data.value);
     };
 
     const onLocalChange = (event, ref) => {
-        console.log("Selected tab on blur: " + selectedValue);
         const found = tabs.filter(item => item.ref === ref).map(tab => tab);
         const instance = found.at(0);
-        console.log(event.target);
         instance.json = event.json;
+        onChange(variables, tabs);
     };
 
     const [tabs, setTabs] = useState([
@@ -131,6 +129,7 @@ export const WithPanels = ({onChange}) => {
         setSelectedValue(name.toLowerCase());
         setTabs(tabs);
         setReload(p => p + 1);
+        onChange(variables, tabs);
     }
 
     function handleDeleteClick() {
@@ -145,6 +144,7 @@ export const WithPanels = ({onChange}) => {
                 setReload(p => p + 1);
             }
         }
+        onChange(variables, tabs);
     }
 
     function handleCancelVariable() {
@@ -181,15 +181,16 @@ export const WithPanels = ({onChange}) => {
                     },
                     value: valueRef.current.value,
                 });
-            setVariables(localVars)
+            setVariables(localVars);
         }
 
         function handleEditVariable() {
-            const currentVariable = variables.at(selectedItems.values().next());
+            const currentVariable = variables.at(selectedItems.values().next().value);
             currentVariable.name = nameRef.current.value;
             currentVariable.type.label = comboRef.current.value;
             currentVariable.value = valueRef.current.value;
             setReload(p => p + 1);
+            onChange(variables, tabs);
         }
 
         return (
@@ -232,8 +233,8 @@ export const WithPanels = ({onChange}) => {
         function onSubmit() {
             const found = tabs.filter(item => item.ref === selectedValue).map(tab => tab);
             found.at(0).name = document.getElementById("editVar").value;
-            console.log(found.at(0).name);
             setReload(p => p + 1);
+            onChange(variables, tabs);
         }
 
         const selItem = tabs.filter(item => item.ref === selectedValue).at(0).name;
@@ -259,7 +260,7 @@ export const WithPanels = ({onChange}) => {
         const isVariable = selectedValue === 'variables';
         const hasVariables = variables.length !== 0;
 
-        const currentVariable = variables.at(selectedItems.values().next());
+        const currentVariable = variables.at(selectedItems.values().next().value);
         const nameValue = currentVariable === undefined ? "" : currentVariable.name;
         const typeValue = currentVariable === undefined ? "" : currentVariable.type.label;
         const valueValue = currentVariable === undefined ? "" : currentVariable.value;
@@ -333,14 +334,16 @@ export const WithPanels = ({onChange}) => {
         );
     }
 
+    useEffect(() => {
+        onChange(variables, tabs);
+    }, [variables, tabs]);
+
     function onSelectionChange(values) {
         // Since we cannot mutate the state value directly better to instantiate new state with the values of the state
         setSelectedItems(values);
-        console.log("Parent: " + selectedItems);
     }
 
     function PrintSelectionCriteria({onSelectionChange}) {
-        console.log(selectedItems);
         const template = tabs.filter(refContent => refContent.ref === selectedValue).map((refContent) =>
             refContent
         );

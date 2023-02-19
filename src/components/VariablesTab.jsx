@@ -17,14 +17,12 @@ function VariableTable({items, onSelectionChange, selectedItems}) {
 
     useEffect(() => {
         if (changeMade) {
-            console.log(localSelectedItems);
             onSelectionChange(localSelectedItems);
             setChangeMade(false);
         }
     }, [localSelectedItems, changeMade]);
 
     function onLocalChangeSelectedItems(event, data) {
-        console.log(localSelectedItems);
         setSelectedItems(data.selectedItems);
         setChangeMade(true);
     }
