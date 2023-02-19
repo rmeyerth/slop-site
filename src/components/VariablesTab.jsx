@@ -1,4 +1,4 @@
-import React, {memo, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {
     DataGrid,
     DataGridHeader,
@@ -10,7 +10,24 @@ import {
 } from "@fluentui/react-components";
 import {Label} from "reactstrap";
 
-function VariableTable({items, onSelectionChange}) {
+function VariableTable({items, onSelectionChange, selectedItems}) {
+
+    const [localSelectedItems, setSelectedItems] = useState([]);
+    const [changeMade, setChangeMade] = useState(false);
+
+    useEffect(() => {
+        if (changeMade) {
+            console.log(localSelectedItems);
+            onSelectionChange(localSelectedItems);
+            setChangeMade(false);
+        }
+    }, [localSelectedItems, changeMade]);
+
+    function onLocalChangeSelectedItems(event, data) {
+        console.log(localSelectedItems);
+        setSelectedItems(data.selectedItems);
+        setChangeMade(true);
+    }
 
     const columns = [
         createTableColumn({
@@ -66,7 +83,8 @@ function VariableTable({items, onSelectionChange}) {
             style={{width: '100%'}}
             selectionMode="multiselect"
             getRowId={(item) => item.name.label}
-            onSelectionChange={onSelectionChange}
+            onSelectionChange={onLocalChangeSelectedItems}
+            defaultSelectedItems={selectedItems}
             resizableColumns
             columnSizingOptions={{
                 name: {
@@ -100,10 +118,10 @@ function VariableTable({items, onSelectionChange}) {
     );
 }
 
-const VariablesTab = ({key, variables, onSelectionChange}) => (
+const VariablesTab = ({key, variables, selectedItems, onSelectionChange}) => (
     <div role="tabpanel" key={key} aria-labelledby='payload' style={{minWidth: '100%', width: '100%', paddingTop: 5}}>
         <div style={{height: 450, border: '1px solid black'}}>
-            <VariableTable items={variables} onSelectionChange={onSelectionChange} />
+            <VariableTable items={variables} onSelectionChange={onSelectionChange} selectedItems={selectedItems} />
             <div style={{minWidth: '100%', alignContent: "center", alignItems: "center", display: "flex", flexDirection: "column"}}>
                 <div style={{height: 20}}></div>
                 {variables.length === 0 && (<Label style={{minWidth: '100%', textAlign: "center", fontSize: 16, fontWeight: "Bold", color: "lightgray"}}>

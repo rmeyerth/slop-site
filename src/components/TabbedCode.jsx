@@ -28,7 +28,7 @@ import {
     Edit20Regular,
     Edit20Filled
 } from "@fluentui/react-icons";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import PayloadTab from "./PayloadTab";
 import VariablesTab from "./VariablesTab";
 const CalendarAgenda = bundleIcon(CalendarAgendaFilled, CalendarAgendaRegular);
@@ -103,6 +103,7 @@ export const WithPanels = ({onChange}) => {
     const [reload, setReload] = useState(1);
     const [count, setCount] = useState(1);
     const [variables, setVariables] = useState([]);
+    const [selectedItems, setSelectedItems] = useState(new Set());
 
     const onTabSelect = (event, data) => {
         console.log("Selected on event " + data.value);
@@ -146,7 +147,7 @@ export const WithPanels = ({onChange}) => {
         setReload(p => p + 1);
     }
 
-    const ExampleContent = () => {
+    const AddVariable = () => {
         const options = ["String", "Number", "Boolean", "Array"];
         const comboRef = useRef(null);
         const nameRef = useRef(null);
@@ -167,6 +168,7 @@ export const WithPanels = ({onChange}) => {
         function handleAddVariable() {
             const localVars = variables.concat(
                 {
+                    selected: false,
                     name: nameRef.current.value,
                     type: {
                         icon: <BookNumber/>,
@@ -247,14 +249,14 @@ export const WithPanels = ({onChange}) => {
                             </PopoverTrigger>
 
                             <PopoverSurface style={{border: "1px solid black"}}>
-                                <ExampleContent />
+                                <AddVariable />
                             </PopoverSurface>
                         </Popover>
                 :
                     <Button appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddClick} ></Button>}
                 &nbsp;
                 {isVariable ?
-                        hasVariables ?
+                        hasVariables && !(selectedItems.size > 1) ?
                             <Button appearance="primary" style={{backgroundColor: "#54A3C4"}} icon={<EditContext/>}></Button>
                         :
                             <Button appearance="primary" style={{backgroundColor: "#54A3C4"}} icon={<EditContext/>} disabled></Button>
@@ -294,15 +296,14 @@ export const WithPanels = ({onChange}) => {
         );
     }
 
-    function onSelectionChange(event, data) {
-        console.log(event);
-        variables.filter(aVar => !data.selectedItems.some(variables.indexOf(aVar)))
-        data.selectedItems.map(index => {
-            setVariables(variables.filter(aVar => )}));
-        variables.at(0)
+    function onSelectionChange(values) {
+        // Since we cannot mutate the state value directly better to instantiate new state with the values of the state
+        setSelectedItems(values);
+        console.log("Parent: " + selectedItems);
     }
 
     function PrintSelectionCriteria({onSelectionChange}) {
+        console.log(selectedItems);
         const template = tabs.filter(refContent => refContent.ref === selectedValue).map((refContent) =>
             refContent
         );
@@ -311,7 +312,7 @@ export const WithPanels = ({onChange}) => {
         const isVariable = instance.isVariable;
         return (
             <div className={styles.panels}>
-                {Boolean(isVariable) && (<VariablesTab keyValue={ref} variables={variables} onSelectionChange={onSelectionChange} />)}
+                {Boolean(isVariable) && (<VariablesTab keyValue={ref} variables={variables} selectedItems={selectedItems} onSelectionChange={onSelectionChange} />)}
                 {Boolean(!isVariable) && (<PayloadTab keyValue={ref} json={instance.json} onChange={onLocalChange} />)}
             </div>
         );
