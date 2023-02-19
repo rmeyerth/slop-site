@@ -134,11 +134,16 @@ export const WithPanels = ({onChange}) => {
     }
 
     function handleDeleteClick() {
-        if (tabs.length !== 0 && tabs.filter((item) => item.ref === selectedValue).at(0).ref !== 'variables') {
-            const index = tabs.indexOf(tabs.filter((item) => item.ref === selectedValue).at(0));
-            setSelectedValue(index !== 0 ? tabs.at(index - 1).ref : tabs.at(0));
-            setTabs(tabs.filter((item) => item.ref !== selectedValue));
-            setReload(p => p + 1);
+        if (tabs.filter((item) => item.ref === selectedValue).at(0).ref === 'variables') {
+            setVariables(variables.filter(aVar => !selectedItems.has(variables.indexOf(aVar))));
+            setSelectedItems(new Set());
+        } else {
+            if (tabs.length > 2) {
+                const index = tabs.indexOf(tabs.filter((item) => item.ref === selectedValue).at(0));
+                setSelectedValue(index !== 0 ? tabs.at(index - 1).ref : tabs.at(0));
+                setTabs(tabs.filter((item) => item.ref !== selectedValue));
+                setReload(p => p + 1);
+            }
         }
     }
 
@@ -147,7 +152,7 @@ export const WithPanels = ({onChange}) => {
         setReload(p => p + 1);
     }
 
-    const AddVariable = () => {
+    const VariablePopup = ({edit, name, type, value}) => {
         const options = ["String", "Number", "Boolean", "Array"];
         const comboRef = useRef(null);
         const nameRef = useRef(null);
@@ -179,17 +184,25 @@ export const WithPanels = ({onChange}) => {
             setVariables(localVars)
         }
 
+        function handleEditVariable() {
+            const currentVariable = variables.at(selectedItems.values().next());
+            currentVariable.name = nameRef.current.value;
+            currentVariable.type.label = comboRef.current.value;
+            currentVariable.value = valueRef.current.value;
+            setReload(p => p + 1);
+        }
+
         return (
             <div>
-                <h3 style={{paddingBottom: 3, borderBottom: '1px solid gray'}}>Add Variable</h3>
+                <h3 style={{paddingBottom: 3, borderBottom: '1px solid gray'}}>{edit ? "Edit" : "Add"} Variable</h3>
                 <div style={{paddingTop: 0}}>
                     <div style={{paddingBottom: 5, width: '100%', display: "flex", flexDirection: "row"}}>
                         <Label style={{minWidth: 100}}>Name:&nbsp;</Label>
-                        <Input style={{minWidth: 250}} ref={nameRef} />
+                        <Input style={{minWidth: 250}} ref={nameRef} defaultValue={name} />
                     </div>
                     <div style={{paddingBottom: 5, display: "flex", flexDirection: "row"}}>
                         <Label style={{minWidth: 100}}>Type:&nbsp;</Label>
-                            <Combobox style={{minWidth: 250}} onOptionSelect={handleItemChange} ref={comboRef}>
+                            <Combobox style={{minWidth: 250}} onOptionSelect={handleItemChange} ref={comboRef} defaultValue={type} >
                                 {options.map(item => (
                                     <Option key={item}>
                                         {item}
@@ -199,11 +212,15 @@ export const WithPanels = ({onChange}) => {
                     </div>
                     <div style={{paddingBottom: 15, display: "flex", flexDirection: "row"}}>
                         <Label style={{minWidth: 100}}>Value:&nbsp;</Label>
-                        <Input style={{minWidth: 250}} ref={valueRef} />
+                        <Input style={{minWidth: 250}} ref={valueRef} defaultValue={value} />
                     </div>
                     <div style={{paddingBottom: 5, display: "content", textAlign: "right"}}>
                         <Button style={{alignSelf: "end"}} appearance="primary" onClick={handleCancelVariable}>Cancel</Button>&nbsp;&nbsp;
-                        <Button style={{alignSelf: "end"}} appearance="primary" onClick={handleAddVariable}>Add</Button>
+                        {edit ?
+                            <Button style={{alignSelf: "end"}} appearance="primary" onClick={handleEditVariable}>Edit</Button>
+                            :
+                            <Button style={{alignSelf: "end"}} appearance="primary" onClick={handleAddVariable}>Add</Button>
+                        }
                     </div>
                 </div>
             </div>
@@ -219,13 +236,15 @@ export const WithPanels = ({onChange}) => {
             setReload(p => p + 1);
         }
 
+        const selItem = tabs.filter(item => item.ref === selectedValue).at(0).name;
+
         return (
             <div>
                 <h3 style={{paddingBottom: 3, borderBottom: '1px solid gray'}}>Edit Object</h3>
                 <div style={{paddingTop: 0}}>
                     <div style={{paddingBottom: 5, width: '100%', display: "flex", flexDirection: "row"}}>
                         <Label style={{minWidth: 100}}>Name:&nbsp;</Label>
-                        <Input id="editVar" style={{minWidth: 250}} />
+                        <Input id="editVar" style={{minWidth: 250}} defaultValue={selItem} />
                     </div>
                     <div style={{paddingBottom: 5, display: "content", textAlign: "right"}}>
                         <Button style={{alignSelf: "end"}} appearance="primary" onClick={handleCancelVariable}>Cancel</Button>&nbsp;&nbsp;
@@ -239,6 +258,12 @@ export const WithPanels = ({onChange}) => {
     function ContextButtons() {
         const isVariable = selectedValue === 'variables';
         const hasVariables = variables.length !== 0;
+
+        const currentVariable = variables.at(selectedItems.values().next());
+        const nameValue = currentVariable === undefined ? "" : currentVariable.name;
+        const typeValue = currentVariable === undefined ? "" : currentVariable.type.label;
+        const valueValue = currentVariable === undefined ? "" : currentVariable.value;
+
         return (
             <div style={{paddingTop: '10px', minWidth: "fit-content"}}>
                 <Text style={{fontWeight: "bold"}}>Context:&nbsp;&nbsp;&nbsp;</Text>
@@ -249,15 +274,23 @@ export const WithPanels = ({onChange}) => {
                             </PopoverTrigger>
 
                             <PopoverSurface style={{border: "1px solid black"}}>
-                                <AddVariable />
+                                <VariablePopup edit={false} />
                             </PopoverSurface>
                         </Popover>
                 :
                     <Button appearance="primary" style={{backgroundColor: "green"}} icon={<AddContext/>} onClick={handleAddClick} ></Button>}
                 &nbsp;
                 {isVariable ?
-                        hasVariables && !(selectedItems.size > 1) ?
-                            <Button appearance="primary" style={{backgroundColor: "#54A3C4"}} icon={<EditContext/>}></Button>
+                        hasVariables && selectedItems.size === 1 ?
+                            <Popover trapFocus positioning={"below-start"}>
+                                <PopoverTrigger disableButtonEnhancement>
+                                    <Button appearance="primary" style={{backgroundColor: "#54A3C4"}} icon={<EditContext/>} ></Button>
+                                </PopoverTrigger>
+
+                                <PopoverSurface style={{border: "1px solid black"}}>
+                                    <VariablePopup edit={true} name={nameValue} type={typeValue} value={valueValue} />
+                                </PopoverSurface>
+                            </Popover>
                         :
                             <Button appearance="primary" style={{backgroundColor: "#54A3C4"}} icon={<EditContext/>} disabled></Button>
                     :
@@ -272,7 +305,11 @@ export const WithPanels = ({onChange}) => {
                         </Popover>
                 }
                 &nbsp;
-                <Button appearance="primary" style={{backgroundColor: "#800000"}} icon={<DeleteContext/>} onClick={handleDeleteClick}></Button>
+                {tabs.filter((item) => item.ref === selectedValue).at(0).ref === 'variables' && hasVariables && selectedItems.size > 0 || tabs.length > 2 ?
+                    <Button appearance="primary" style={{backgroundColor: "#800000"}} icon={<DeleteContext/>} onClick={handleDeleteClick}></Button>
+                :
+                    <Button appearance="primary" style={{backgroundColor: "#800000"}} icon={<DeleteContext/>} disabled></Button>
+                }
             </div>
         )
     }
