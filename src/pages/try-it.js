@@ -26,11 +26,7 @@ Button.defaultProps = {
   theme: "blue"
 }
 
-const addNewRecord = async (expression, payload) => {
-  const RecordBodyParameters = {
-    'expression': expression,
-    'payload': JSON.parse(payload)
-  }
+const addNewRecord = async (RecordBodyParameters) => {
 
   const options = {
     method: 'POST',
@@ -102,7 +98,7 @@ function RenderResult() {
 
   function handleButtonClick() {
     console.log(refreshJson());
-    addNewRecord(expressionValue, refreshJson())
+    addNewRecord(refreshJson())
       .then(response => {
           setApiResponse('> ' + response);
         }
@@ -132,7 +128,7 @@ function RenderResult() {
         });
       })
     };
-    return JSON.stringify(value);
+    return value;
   }
 
   const styles = useIconStyles();
