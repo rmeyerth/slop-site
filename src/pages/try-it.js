@@ -4,7 +4,7 @@ import {
   FluentProvider,
   teamsLightTheme,
   Text,
-  Button, Image, makeStyles, Link,
+  Button, Image, makeStyles, Link, Input,
 } from '@fluentui/react-components';
 import {
   BookQuestionMark20Regular,
@@ -94,14 +94,16 @@ function RenderResult() {
   const [apiResponse, setApiResponse] = useState("> ");
   const [expressionValue, setExpressionValue] = useState("");
   const [contextValue, setContextValue] = useState(JSON.stringify(sampleJson));
-  const [state, setState] = useState({});
+  const [variables, setVariables] = useState([]);
+  const [tabs, setTabs] = useState([]);
 
   function handleExpressionChange(event) {
     setExpressionValue(event.target.value);
   }
 
   function handleButtonClick() {
-    addNewRecord(expressionValue, contextValue)
+    console.log(refreshJson());
+    addNewRecord(expressionValue, refreshJson())
       .then(response => {
           setApiResponse('> ' + response);
         }
@@ -109,11 +111,18 @@ function RenderResult() {
   }
 
   function handleOnChange(inVars, tabs) {
-    console.log(inVars);
-    console.log(tabs);
+    setVariables(inVars);
+    setTabs(tabs);
+  }
+
+  // useEffect(() => {
+  //   refreshJson();
+  // }, [variables, tabs, expressionValue]);
+
+  function refreshJson() {
     const value = {
       expression: expressionValue,
-      variables: inVars.map(aVar => {
+      variables: variables.map(aVar => {
         return ({
           [aVar.name]: aVar.value
         });
@@ -124,7 +133,7 @@ function RenderResult() {
         });
       })
     };
-    console.log(JSON.stringify(value));
+    return JSON.stringify(value);
   }
 
   const styles = useIconStyles();
@@ -140,8 +149,15 @@ function RenderResult() {
               <div style={{height: 10}}/>
               <form>
                 <div style={{display: "flex", width: '100%', marginBottom: 10}}>
-                  <Appearance onChange={handleExpressionChange}/>&nbsp;&nbsp;
-                  <Button appearance="primary" onClick={handleButtonClick} icon={<RunExpression/>}>Run</Button>&nbsp;&nbsp;
+                  <Input appearance="outline" id="input-online" placeholder="Type expression here..." style={{width: '100%'}} onBlur={refreshJson} onChange={handleExpressionChange} />
+                  &nbsp;&nbsp;
+                  {expressionValue.length === 0 ?
+                      <Button appearance="primary" onClick={handleButtonClick} icon={<RunExpression/>}
+                              disabled>Run</Button>
+                      :
+                      <Button appearance="primary" onClick={handleButtonClick} icon={<RunExpression/>}>Run</Button>
+                  }
+                  &nbsp;&nbsp;
                   <NestedSubmenus />
                 </div>
                 <div style={{padding: 10, display: "flex", flexDirection: "column", verticalAlign: "top", width: '100%', backgroundColor: "#eff8fc", border: "1px solid black"}}>
