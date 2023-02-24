@@ -93,9 +93,8 @@ export const RunExpression = bundleIcon(Play20Filled, Play20Regular);
 function RenderResult() {
   const [apiResponse, setApiResponse] = useState("> ");
   const [expressionValue, setExpressionValue] = useState("");
-  const [contextValue, setContextValue] = useState(JSON.stringify(sampleJson));
-  const [variables, setVariables] = useState([]);
-  const [tabs, setTabs] = useState([]);
+  const [variables, setVariables] = useState({variables: []});
+  const [tabs, setTabs] = useState({objects: [sampleJson]});
 
   function handleExpressionChange(event) {
     setExpressionValue(event.target.value);
