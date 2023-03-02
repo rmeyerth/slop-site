@@ -20,7 +20,7 @@ import {WithPanels} from "../components/TabbedCode";
 import {Appearance} from "../components/Appearance";
 import {NestedSubmenus} from "../components/Menu";
 
-const runExpressionEndpoint = "https://1345-18-170-107-134.eu.ngrok.io/api/v1/request";
+const runExpressionEndpoint = "https://63d5-18-170-107-134.eu.ngrok.io/api/v1/request";
 
 Button.defaultProps = {
   theme: "blue"
