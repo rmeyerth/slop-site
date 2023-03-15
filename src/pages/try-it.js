@@ -91,6 +91,7 @@ function RenderResult() {
   const [expressionValue, setExpressionValue] = useState("");
   const [variables, setVariables] = useState({variables: []});
   const [tabs, setTabs] = useState({objects: [sampleJson]});
+  const [reload, setReload] = useState(1);
 
   function handleExpressionChange(event) {
     setExpressionValue(event.target.value);
@@ -105,9 +106,13 @@ function RenderResult() {
       );
   }
 
-  function handleOnChange(inVars, tabs) {
+  function handleOnChange(expression, inVars, tabs, refresh) {
+    if (expression !== undefined) setExpressionValue(expression);
     setVariables(inVars);
     setTabs(tabs);
+    console.log(variables);
+    console.log(tabs);
+    if (refresh) setReload(p => p + 1);
   }
 
   // useEffect(() => {
@@ -128,6 +133,7 @@ function RenderResult() {
         });
       })
     };
+    console.log(value);
     return value;
   }
 
@@ -153,7 +159,7 @@ function RenderResult() {
                       <Button appearance="primary" onClick={handleButtonClick} icon={<RunExpression/>}>Run</Button>
                   }
                   &nbsp;&nbsp;
-                  <NestedSubmenus />
+                  <NestedSubmenus onChange={handleOnChange} />
                 </div>
                 <div style={{padding: 10, display: "flex", flexDirection: "column", verticalAlign: "top", width: '100%', backgroundColor: "#eff8fc", border: "1px solid black"}}>
                   <div className={styles.icon} style={{verticalAlign: "center", display: "flex", flexDirection: "row"}}>
@@ -169,7 +175,7 @@ function RenderResult() {
                   </div>
                 </div>
                 <div style={{height: 5}}/>
-                <WithPanels onChange={handleOnChange} />
+                {Boolean(reload) && (<WithPanels onChange={handleOnChange} />)}
               </form>
               <div style={{height: 10}}/>
               <div style={{borderTop: "1px solid black", borderLeft: "1px solid black", borderRight: "1px solid black", height: 30, paddingLeft: 10, paddingTop: 3, backgroundColor: "#A9A8A8"}}>
@@ -188,7 +194,7 @@ function RenderResult() {
 
 export default function Hello() {
   return (
-    <Layout title="Hello" description="Hello React Page">
+    <Layout title="Try It Now" description="Try the latest version of SLOP in your browser!">
       <RenderResult />
     </Layout>
   );

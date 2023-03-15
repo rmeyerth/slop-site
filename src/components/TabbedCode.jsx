@@ -113,7 +113,7 @@ export const WithPanels = ({onChange}) => {
         const found = tabs.filter(item => item.ref === ref).map(tab => tab);
         const instance = found.at(0);
         instance.json = event.json;
-        onChange(variables, tabs);
+        onChange(undefined, variables, tabs, false);
     };
 
     const [tabs, setTabs] = useState([
@@ -129,7 +129,7 @@ export const WithPanels = ({onChange}) => {
         setSelectedValue(name.toLowerCase());
         setTabs(tabs);
         setReload(p => p + 1);
-        onChange(variables, tabs);
+        onChange(undefined, variables, tabs, false);
     }
 
     function handleDeleteClick() {

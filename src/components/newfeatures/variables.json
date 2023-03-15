@@ -1,0 +1,12 @@
+{
+  "expression": "1 + 1",
+  "variables": 123,
+  "objects": [
+    {
+      "objecta": {
+        "fieldA": 123,
+        "fieldB": "hello world!"
+      }
+    }
+  ]
+}

@@ -6,8 +6,53 @@ import {
     MenuItem,
     MenuPopover,
 } from "@fluentui/react-components";
+const CalendarAgenda = bundleIcon(CalendarAgendaFilled, CalendarAgendaRegular);
+const BookNumber = bundleIcon(BookNumber20Filled, BookNumber20Regular);
+import varExample from "./newfeatures/variables.json";
 import * as React from "react";
-const NewFeaturesSubMenu = () => {
+import {
+    BookNumber20Filled,
+    BookNumber20Regular,
+    bundleIcon,
+    CalendarAgendaFilled,
+    CalendarAgendaRegular
+} from "@fluentui/react-icons";
+
+class TabContent {
+    constructor(inRef,name,comp,disabled,json,isVariable) {
+        this.ref = inRef;
+        this.name = name;
+        this.icon = comp;
+        this.disabled = disabled;
+        this.json = json;
+        this.isVariable = isVariable;
+    }
+}
+
+function loadObjectData(data) {
+    const result = new Set();
+    data.objects.forEach(o => {
+        let rootName = Object.keys(o)[0];
+        console.log(o[rootName]);
+        result.add(new TabContent(rootName, rootName, <CalendarAgenda/>, false, JSON.stringify(o[rootName]), false))
+    });
+    console.log(result);
+    return result;
+}
+
+function loadVariableData(data) {
+    return [];
+}
+
+const NewFeaturesSubMenu = ({onChange}) => {
+
+    function loadExample(source) {
+        switch (source.target.innerText) {
+            case "Variables": onChange(loadVariableData(varExample), loadObjectData(varExample)); break;
+            default: console.log("other");
+        }
+    }
+
     return (
         <Menu>
             <MenuTrigger disableButtonEnhancement>
@@ -16,7 +61,7 @@ const NewFeaturesSubMenu = () => {
 
             <MenuPopover>
                 <MenuList>
-                    <MenuItem>Variables</MenuItem>
+                    <MenuItem onClick={loadExample}>Variables</MenuItem>
                     <MenuItem>Collection Filters</MenuItem>
                     <MenuItem disabled>Static Referencing</MenuItem>
                     <MenuItem>Unary Operator</MenuItem>
@@ -82,11 +127,11 @@ const LiteralsSubMenu = () => {
         </Menu>
     );
 };
-export const NestedSubmenus = () => {
+export const NestedSubmenus = ({onChange}) => {
     return (
         <Menu>
             <MenuTrigger disableButtonEnhancement>
-                <Button appearance="primary" style={{backgroundColor: "green"}} disabled>Examples</Button>
+                <Button appearance="primary" style={{backgroundColor: "green"}}>Examples</Button>
             </MenuTrigger>
 
             <MenuPopover>
@@ -94,7 +139,7 @@ export const NestedSubmenus = () => {
                     <LiteralsSubMenu />
                     <StatementsSubMenu />
                     <FunctionsSubMenu />
-                    <NewFeaturesSubMenu />
+                    <NewFeaturesSubMenu onChange={onChange} />
                 </MenuList>
             </MenuPopover>
         </Menu>
