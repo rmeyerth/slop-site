@@ -92,6 +92,7 @@ function RenderResult() {
   const [variables, setVariables] = useState({variables: []});
   const [tabs, setTabs] = useState({objects: [sampleJson]});
   const [reload, setReload] = useState(1);
+  const [actualChange, setActualChange] = useState(false);
 
   function handleExpressionChange(event) {
     setExpressionValue(event.target.value);
@@ -106,18 +107,37 @@ function RenderResult() {
       );
   }
 
-  function handleOnChange(expression, inVars, tabs, refresh) {
+  function handleOnChange(expression, inVars, inTabs, refresh) {
+    console.log("expression: " + expression);
+    console.log("inVars: " + inVars);
+    console.log("inTabs: " + JSON.stringify(inTabs));
+    console.log("refresh: " + refresh);
     if (expression !== undefined) setExpressionValue(expression);
     setVariables(inVars);
-    setTabs(tabs);
-    console.log(variables);
-    console.log(tabs);
+    setTabs(inTabs);
+    setActualChange(refresh);
     if (refresh) setReload(p => p + 1);
   }
 
-  // useEffect(() => {
-  //   refreshJson();
-  // }, [variables, tabs, expressionValue]);
+  useEffect(() => {
+    if (actualChange) {
+      refreshJson();
+    }
+  }, [expressionValue, variables, tabs]);
+
+  useEffect(() => {
+    const listener = event => {
+      if (event.code === "Enter" || event.code === "NumpadEnter") {
+        console.log("Enter key was pressed. Run your function.");
+        event.preventDefault();
+        handleButtonClick();
+      }
+    };
+    document.addEventListener("keydown", listener);
+    return () => {
+      document.removeEventListener("keydown", listener);
+    };
+  }, []);
 
   function refreshJson() {
     const value = {
@@ -133,7 +153,7 @@ function RenderResult() {
         });
       })
     };
-    console.log(value);
+    setActualChange(false);
     return value;
   }
 

@@ -30,11 +30,10 @@ class TabContent {
 }
 
 function loadObjectData(data) {
-    const result = new Set();
+    const result = [];
     data.objects.forEach(o => {
         let rootName = Object.keys(o)[0];
-        console.log(o[rootName]);
-        result.add(new TabContent(rootName, rootName, <CalendarAgenda/>, false, JSON.stringify(o[rootName]), false))
+        result.push(new TabContent(rootName, rootName, <CalendarAgenda/>, false, JSON.stringify(o[rootName]), false))
     });
     console.log(result);
     return result;
@@ -47,8 +46,11 @@ function loadVariableData(data) {
 const NewFeaturesSubMenu = ({onChange}) => {
 
     function loadExample(source) {
+        console.log("loading example");
         switch (source.target.innerText) {
-            case "Variables": onChange(loadVariableData(varExample), loadObjectData(varExample)); break;
+            case "Variables":
+                onChange(varExample.expression, loadVariableData(varExample), loadObjectData(varExample), true);
+                break;
             default: console.log("other");
         }
     }
