@@ -88,10 +88,6 @@ const config = {
             title: 'Community',
             items: [
               {
-                label: 'Forum',
-                href: 'http://slop.boards.net',
-              },
-              {
                 label: 'Credits',
                 href: '/credits'
               }

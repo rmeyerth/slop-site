@@ -1,5 +1,5 @@
 ---
-slug: release
+slug: release135
 title: SLOP 1.35 Release
 authors: [tronied]
 tags: [slop]

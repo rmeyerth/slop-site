@@ -138,7 +138,7 @@ function RenderResult() {
           <div style={{display: "block", boxSizing: "border-box", flexGrow: 1, paddingBottom: 30, maxWidth:'1280px'}}>
               <h1>SLOP Playground</h1>
               <div style={{paddingBottom: 10}}>
-                <Text align="justify">Below you can evaluate expressions using <font color="blue">SLOP 1.35</font>. Define your own or select one of the pre-configured examples.</Text>
+                <Text align="justify">Below you can evaluate expressions using <font color="blue">SLOP 1.37</font>. Define your own or select one of the pre-configured examples.</Text>
               </div>
               <div style={{height: 2, backgroundColor: "darkblue"}}></div>
               <div style={{height: 10}}/>
