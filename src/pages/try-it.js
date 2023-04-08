@@ -162,7 +162,8 @@ function RenderResult() {
                   </div>
                   <div>
                     <Text align="justify">
-                      Here you can define your own expressions and customise the objects and variables within the context. Alternatively
+                      Here you can define your own expressions and customise the objects and variables within the context. To do this
+                      simply use the object name with the path to the field e.g. <span style={{paddingLeft: 4, paddingRight: 4, backgroundColor: "#eaeaea", color: "green", fontFamily: "monospace"}}>Acme.employees.name</span>. Alternatively
                       you can try out some of the examples by clicking the "Examples" button and selecting from one of the pre-defined
                       scenarios available.
                     </Text>
