@@ -37,3 +37,11 @@ html[data-theme='dark'] {
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+.monospace-input {
+  width: 100%
+}
+
+.monospace-input > input[type="text"] {
+  font-family: monospace !important;
+}

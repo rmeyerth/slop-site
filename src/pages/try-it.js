@@ -17,7 +17,6 @@ import {
 } from "@fluentui/react-icons";
 
 import {WithPanels} from "../components/TabbedCode";
-import {Appearance} from "../components/Appearance";
 import {NestedSubmenus} from "../components/Menu";
 
 const runExpressionEndpoint = "https://9163-18-133-159-179.eu.ngrok.io/api/v1/request";
@@ -144,7 +143,7 @@ function RenderResult() {
               <div style={{height: 10}}/>
               <form>
                 <div style={{display: "flex", width: '100%', marginBottom: 10}}>
-                  <Input appearance="outline" id="input-online" placeholder="Type expression here..." style={{width: '100%'}} onBlur={refreshJson} onChange={handleExpressionChange} />
+                  <Input id="input-online" className="monospace-input" placeholder="Type expression here..." onBlur={refreshJson} onChange={handleExpressionChange} />
                   &nbsp;&nbsp;
                   {expressionValue.length === 0 ?
                       <Button appearance="primary" onClick={handleButtonClick} icon={<RunExpression/>}
@@ -177,7 +176,7 @@ function RenderResult() {
                 <Text style={{color: "black"}}>Output (<font color="yellow">Click run to begin</font>)</Text>
               </div>
               <div style={{borderStyle: "solid", borderWidth: "1px", paddingLeft: 8, paddingTop: 3, minHeight: 100, backgroundColor: "#EAEAEA"}}>
-                <Text align="justify">
+                <Text style={{ fontFamily: "Monospaced" }}>
                   {apiResponse}
                 </Text>
               </div>
