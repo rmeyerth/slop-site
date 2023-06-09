@@ -4,7 +4,7 @@ title: SLOP 1.50 Release
 authors: [tronied]
 tags: [slop]
 ---
-I’m excited to announce the most significant update so far. It includes many new features that enhance both the language and toolkit. I apologize 
+I’m excited to announce the most significant update so far. It includes many new features that enhance both the language and toolkit. I apologise 
 yet again for not updating the documentation, but I promise to work on it as soon as possible. In the meantime, you can use this announcement as 
 a reference for the new features.
 
@@ -29,11 +29,11 @@ for (int i = 0;i < 10;i++) {
     println("Loop " + i);
 }
 ```
-So far so easy, with our traditional approach we can define the following:
+So far so easy, with our traditional approach we can define the following?
 ```
 'for' '(' ( expr ';' expr ';' expr ) ')' '{' ( expr ';' )+ '}'
 ```
-Ok, fine but how would you now add single line support like the following:
+Fine, but how would we now add single line support like the following:
 ```java
 for (int i = 0;i < 10;i++) println("Loop " + i);
 ```
@@ -49,15 +49,15 @@ versions which are now deprecated:
 ```
 Grammar references are defined within a pair of square brackets. You can have one or more references to other tokens based on whether you want a
 fixed but deferred responsibility to another token, or a branch. At this stage I also need to introduce the idea of token types. By default all
-tokens have a PRIMARY type. However, you can now define SECONDARY tokens which can't be used on their own but are dependant on other tokens.
-In the above example, the ForToken is a PRIMARY with both FixedLoopToken and VariableLoopToken's being SECONDARY.
+tokens have the default PRIMARY type assigned. However, you can now define tokens to be SECONDARY where they can't be used on their own, but 
+are dependent on other tokens. In the above example, the ForToken is the PRIMARY with both FixedLoopToken and VariableLoopToken's being SECONDARY.
 
 In somewhat of a divergence, the SingleLineToken is a PRIMARY but the MultiLineToken is a SECONDARY. Why is this? Well, as part of normal code 
 you could define:
 ```
 myVar = 1 + 1;
 ```
-You would not however do the same with a multi-line brackets unless it belonges to another token. Of course this up to the individual and their
+You would not however do the same with a multi-line brackets unless it belongs to another token. Of course this up to the individual and their
 language so this can always be changed. A token can be defined as a SECONDARY by calling the overloaded Token constructor here:
 ```java
 public FixedLoopToken() {
@@ -209,8 +209,64 @@ iteration and variable store, a new version is pushed to a stack and removed onc
 
 ## Types
 Having gone through the trials of implementing functions and recursion, I thought I may as well go all in and implement types. This required a bit of
-creating thinking as to how this would work. The first stage was to add a new variable type called PROTOTYPE which acts as a blueprint from which
-instances can be created.
+creating thinking as to how this would work. The first stage was to add a new variable type called PROTOTYPE so that it can act as a blueprint from which
+instances can be created. The biggest issue was how to deal with type properties. Variables could be defined within the class itself, but without creating
+lots of handlers and relations, how could they easily be managed? In the end I decided to store a LinkedHashMap as the instance value and that would store 
+each field value. In this first iteration, these would be defined either through definition in the type declaration or as part of a constructor.
+
+I still plan on managing instance declared variables at the top-level to this map, but this will require further work of capturing those set events which 
+I deemed outside the scope of this first trial implementation. As such, the format I came up with for defining a type uses the following:
+```
+type MyType(a,b,c) {
+   /* ... */
+}
+```
+### Parameters / Variables
+These parameters work in the same way as a Java record where the type has 3 fields (a, b and c). These values can be accessed from within the instance 
+and its children as well as from the outside using the FieldToken. For example, for the following:
+```
+type MyType(a,b,c) {
+   /* ... */
+}
+
+test = new MyType(1,2,3);
+return test.a + test.b + test.c;
+```
+This would return the result 6. Likewise, doing the following:
+```
+type MyType(a,b,c) {
+   function aTest() {
+      return a + b + c;
+   }
+}
+
+test = new MyType(1,2,3);
+return test.aTest();
+```
+Would return the same result.
+### Inheritance
+The current model for inheritance only supports extending the functionality and properties of another type. Parents can be defined by using the '<-' 
+notation after the name and optional parameters. For example:
+```
+type ParentType(d);
+
+type ChildType(a,b,c,d) <- ParentType;
+
+test = new ChildType(1,2,3,4);
+return test.a + test.d;
+```
+This looks a bit strange as neither the ParentType nor ChildType's have bodies. This is actually optional, but still allows properties
+to be referenced, used and changed. In the above case we see that we have the ParentType which has a property of 'd'. However, by
+defining that property we also make it a required field which must be set. This is why we also declare 'd' in the ChildType declaration.
+If we don't declare that and just do ``type ChildType(a,b,c) <- ParentType;``, we get the following error:
+```
+'MyType' has a dependency on 'ParentType' which requires parameter(s) 'd' to be 
+defined in the class definition or constructor. Please add this to the MyType 
+type definition.
+```
+Functions and resources can be defined in the parent and used within the child class. There is no notion of modifiers yet, so everything is public
+at this early stage.
+### Constructors
 
 - Parameters
 - Inheritance
