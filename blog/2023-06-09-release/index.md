@@ -146,7 +146,7 @@ for(char : A..Z) return & char;
 This returns a list of all characters (inclusive) between A and Z. You can also use numbers and other characters as it simply iterates between the
 two, so be warned you might end up with a big list!
 ### Elvis
-...no, not the King. I put this in the token section although traditionally it is called an Elvis operator. During my recent play with functions and
+...no, not him. I put this in the token section although traditionally it is called an Elvis operator. During my recent play with functions and
 recursion, I noticed it was a pain to keep comparing a value to null using the traditional conditional token. As such, although I've never used it
 in anger in another language, I thought it would be nice to add this feature. It simply follows the approach where if a value is null then it uses a 
 defined secondary value. An example can be seen here:
@@ -167,8 +167,51 @@ here as regardless of whether it exists in the map or not, we are re-adding it. 
 recursive approach. This brings us nicely onto the next section which is...
 
 ## Functions
-- Recursion
-Types
+Apologies if you're confused by what I mean by functions as surely haven't we had functions since the beginning? Well, those were what I would refer
+to as system and definitely Java written functions. As you have no doubt seen by the above, what I am referring to here are user defined functions
+which can be defined and run through the use of the updated InvocationToken. These work much in the same way as most other languages. They define a 
+list of parameters which are a requirement to be fulfilled when it is called. The FunctionToken makes use of a new toolkit interface called TokenParameters
+which allows parameters to be passed between two tokens directly:
+```java
+public class FunctionToken extends Token<Void> implements TokenParameters {
+
+    public FunctionToken() {
+        super("Function", null);
+    }
+                                                                           
+    //...
+                                                                           
+    @Override
+    public List<Token<?>> process(SLOPParser parser, SLOPContext context, SLOPConfig config) {
+        //Adds itself as a SINGLETON into memory under the function name
+    }
+       
+    @Override
+    public List<Token<?>> process(SLOPParser parser, SLOPContext context, SLOPConfig config, List<Token<?>> providedParams) {
+        //Evaluates the embedded function tokens to resolve a result
+    }
+}
+```
+When the token is first evaluated by the parser, it calls the traditional process method. This simply adds itself into memory as a SINGLETON. This is
+a variable type meaning that so long as it's not part of an instance, there is only ever one of them. The other method is called directly by the 
+InvocationToken so that parameters can be passed.
+
+Another big challenge was supporting recursion. This is because each time a method is called it needs to maintain its own set of values of the
+same parameters and changes to those. The test method for this was the following simple function:
+```
+func fibonacci(n) {
+   return n <= 1 ? n : fibonacci(n - 1) + fibonacci(n - 2);
+}
+result = fibonacci(10);
+```
+After many hours trawling through stack traces and logs, I finally came out with an approach using multi-layered variable storing. On each recursive
+iteration and variable store, a new version is pushed to a stack and removed once the token execution has completed. 
+
+## Types
+Having gone through the trials of implementing functions and recursion, I thought I may as well go all in and implement types. This required a bit of
+creating thinking as to how this would work. The first stage was to add a new variable type called PROTOTYPE which acts as a blueprint from which
+instances can be created.
+
 - Parameters
 - Inheritance
 - Constructors
