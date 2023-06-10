@@ -342,8 +342,47 @@ that's not to say this won't increase in number in future. Please let me know if
 get them added into the next release.
 
 ### Variable Types
+Variable types determine how a value that is stored in context is handled. There are currently five types which are the following:
+```java
+public enum VariableType {
+    DEFAULT,
+    PARAMETER,
+    PROTOTYPE,
+    INSTANCE,
+    SINGLETON
+}
+```
+1. DEFAULT: This is the default type for a stored value and no special provisions will be undertaken. The value is simply stored 
+and retrieved
+2. PARAMETER: This is used when storing parameter values of tokens. The difference here is that special provision is given to
+keeping track of the depth of the active token when it is defined. It also uses a variable stack so that as a function is recursed, 
+values are pushed and removed upon each declaration and token completion. This means that even if a function calls itself mid-way,
+once the recursion has completed and returned, the original parameter value will now be the top of the stack. This accounts for
+changes to that variable as the token and depth will remain the same until it is completed.
+3. PROTOTYPE: This is where a token acts as a blueprint for an INSTANCE type variable. A token adds itself as a PROTOTYPE when it
+is initially called by the parser, but then can be cloned to create instances. It is similar to a SINGLETON as only one will 
+exist under a given name.
+4. INSTANCE: An instance is cloned from a PROTOTYPE. This is used to flag to other tokens that a given object can be modified.
+In the case of SLOP, this is used by the FieldToken to check that the reference is an instance. If so it will defer the calls to 
+the token instance.
+5. SINGLETON: Much like the design pattern, this ensures that only one exists in memory at any one time. This is used by functions
+defined at the top-level.
 
-- Variable Types
-    - Instances
-    - Prototypes
-    - Singleton
+## Closing Comments
+I realise that with this update not everything has been left in a fully completed state. Types still require some attention but 
+for a first try I am happy with the results. More work and testing is planned to finalize what works and what doesn't. I think
+this is the first time I now look at the project and feel it is finally starting to reach maturity. The speed at which I am
+able to add features shows I've done something right. Everything just fits together well and it's rare I ever come across a 
+situation where changes need to be made to the underlying code to get something to work (ahem, Parser Flags).
+
+My plans for the future are to keep pushing the envelope and see where I end up. I now view SLOP as almost a language 
+creation tool rather than a language in its own right. The current group of tokens is more acting as a test platform to 
+ensure everything is working as it should. The next steps will be to release another artifact for just the toolkit, 
+stripping out all but the base tokens. From there I'll aim to write a tutorial on how to get started and put it 
+out there. Don't get me wrong, there are still bugs I've yet to discover in the lexer and no doubt these will arise when
+this happens, but I feel now is the time to release it and see what happens.
+
+Until the next time, as always you can always contact me with issues, questions or feedback at rmeyer@hotmail.co.uk. I 
+always welcome hearing from anyone good or bad.
+
+Robert.
