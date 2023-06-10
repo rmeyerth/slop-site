@@ -10,47 +10,51 @@ a reference for the new features.
 
 ## Grammar Changes
 ### Type Restrictions
-The gammar system uses several keywords to represent tokens. This change relates to the 'val' keyword as it can now support a type to be specified 
-to limit what it can be used for. As an example, let's look at the newly renamed InvocationToken, once called the OperationToken. This has the 
-following pattern and we can see that the first capture token now has an added type:
+Token grammar patterns presently use the 'val' keyword to define a token to be captured. As the grammar is fairly easy-going in terms of what 
+this could represent, this in theory could be anything. This causes issues when we want a token to be of a specific type. Let's use the 
+newly renamed InvocationToken, once called the OperationToken as an example. The pattern for this is defined using the following:
+```
+val '(' ( expr ','? )+ ')'
+```
+This works, but as mentioned that 'val' could be anything. For example, you could have an IfToken defined as the name with the brackets and 
+parameters after! This is where the new ability to specify type restrictions can be used:
 ```
 val:String '(' ( expr ','? )+ ')'
 ```
-This makes a lot of sense as these restrictions are necessary to ensure the code is defined as expected. For example, up until now you could have
-had an IfToken defined as the name with the brackets and parameters aferwards! Although no doubt that would have been caught and rejected at the 
-parser stage, we do need to ensure language structure and rules can be enforced if desired. As such, in this scenario we can restrict the name of 
-whatever it is we're calling to a a simple String.
+To add a type we simply add a ':' and the named type of the value it is expecting. If the token provided does not match then this token will not
+get matched or if it's already on the stack during tokenization, it will throw an error. This should allow a lot more control with regards to the
+structure of our tokens and error reporting.
 
 ### Grammar References
-Up until now, if you wanted to define a token pattern you had to be fairly explicit in its structure. This mean't that everything within your 
-intended syntax had to be explicitly declared. Let's look a Java for loop as an example where this would be a problem:
+Up until now, if you wanted to define a token you had to be fairly explicit with the pattern structure. Everything had to be declared in full will 
+little option for deviation. Let's look the Java for loop as an example where this would be a problem:
 ```java
 for (int i = 0;i < 10;i++) {
     println("Loop " + i);
 }
 ```
-So far so easy, with our traditional approach we can define the following?
+So far so easy, with our traditional approach we can define the following:
 ```
 'for' '(' ( expr ';' expr ';' expr ) ')' '{' ( expr ';' )+ '}'
 ```
-Fine, but how would we now add single line support like the following:
+Fine, but how would we now add single line support like the following?
 ```java
 for (int i = 0;i < 10;i++) println("Loop " + i);
 ```
-You could make the curly braces optional tokens, but this can quickly turn into a mess. Additionally, what happens when we want to add support
-for different types of loops? Java supports both for-each and the for loop using the same 'for' keyword and you can't do that using optionals.
-This is the problem I originally faced when adding loops which led to me creating separate ForEachToken and RepeatToken's. 
+You could make the curly braces optional tokens, but this can quickly turns into a mess. Additionally, what happens when we want to add support
+for different types of loops? Java supports both for and for-each loops using the same keyword and you can't do that using optionals. This is the 
+problem I originally faced when adding loops which led to me creating separate loop tokens (ForEachToken and RepeatToken). 
 
 This is where the new grammar references can be used as they provide the option to split the pattern so not only do you not need to declare 
-everything within one token, but also the option to support branching patterns. Let's look at the new ForToken which replaces both previous 
-versions which are now deprecated:
+everything within one token, but also providing the option to support branching patterns. Let's look at the new ForToken which replaces both previous 
+versions (now deprecated):
 ```
 'for' '(' [ fixedLoop, variableLoop ] ')' [ singleLine, multiLine ]
 ```
 Grammar references are defined within a pair of square brackets. You can have one or more references to other tokens based on whether you want a
-fixed but deferred responsibility to another token, or a branch. At this stage I also need to introduce the idea of token types. By default all
-tokens have the default PRIMARY type assigned. However, you can now define tokens to be SECONDARY where they can't be used on their own, but 
-are dependent on other tokens. In the above example, the ForToken is the PRIMARY with both FixedLoopToken and VariableLoopToken's being SECONDARY.
+fixed structure with deferred processing, or a branch. At this stage I also need to introduce the idea of token types. By default, all tokens have 
+the default PRIMARY type assigned. However, you can now define tokens to be SECONDARY where they can't be used on their own but are dependent on 
+other tokens. In the above example, the ForToken is the PRIMARY with both FixedLoopToken and VariableLoopToken's being SECONDARY.
 
 In somewhat of a divergence, the SingleLineToken is a PRIMARY but the MultiLineToken is a SECONDARY. Why is this? Well, as part of normal code 
 you could define:
@@ -72,9 +76,9 @@ public String getPattern() {
     return "expr ';' expr ';' expr";
 }
 ```
-One final note about this is the addition of a new interface called TokenCallback. This provides a method with a callback to the parent 
-token. Why would we do this? Well, on each iteration of the loop, we would want to call back to the parent token to invoke the body token. This is
-achieved through a functional interface and subsequent lambda function. Here is the process function code of the ForToken:
+There is also the addition of a new interface called TokenCallback. This provides a method with a callback to the parent token. Why would we do 
+this? Well, on each iteration of the loop, we would want to call back to the parent token to invoke the body token. This is achieved through
+a functional interface and subsequent lambda function. Here is the process function code of the ForToken:
 ```java
 @Override
 public List<Token<?>> process(SLOPParser parser, SLOPContext context, SLOPConfig config) {
@@ -92,7 +96,7 @@ public List<Token<?>> process(SLOPParser parser, SLOPContext context, SLOPConfig
 ```
 You'll also notice mention of a ReturnToken. This replaces the existing 'result = ' method used to transport values. This also makes use of a new
 feature called Parser Flags, but I'll save explaining that and some of the finer points about the return until later. As one final comment on 
-grammar references, migration of existing tokens over to using grammar references has started but is a gradual proccess. As such, whilst some
+grammar references, migration of existing tokens over to using grammar references has started but is a gradual process. As such, whilst some
 have been done others do remain untouched. Rest-assured though that upgrades will be made where applicable to all tokens in the future.
 
 ## New operators
@@ -116,7 +120,7 @@ private Token<?> handleMapOperations(SLOPContext context, OperatorHandler handle
     }
 }
 ```
-We can now run the following code and add to a map:
+We can now run the following code:
 ```
 myMap = {};
 myMap += {aKey -> aValue};
@@ -132,11 +136,11 @@ list which you then add elements to and return. An example can be seen here:
 ```
 for (emp : employees) return &emp.name;
 ```
-This will return a list of all employees names, though I would suggest avoiding this for this purpose as you can simply do:
+This will return a list of all employees names, though I would suggest using this alternative instead if extracting a field from a collection:
 ```
 employees.name
 ```
-to get the same result. If the '&' were to be omitted, then this would return the first instance of an employee name.
+If the '&' were to be omitted, this would return the first instance of an employee name.
 ### Range
 The range token provides a fast way of creating a list of values between two values. It is used by defining two values separated by '..' and can be 
 used in other tokens as it just returns a standard collection. For example, you can now define the following:
@@ -161,7 +165,7 @@ func fastFib(n) {
 }
 return fastFib(47);
 ```
-Firstly, yes that is a comment and another new feature, though not reall noteworthy compared to the rest of this. In the above example we are checking
+Firstly, yes that is a comment and another new feature, though not really noteworthy compared to the rest of this. In the above example we are checking
 to see if the current n iteration exists in the memory map. If so, we can skip recursing and just use that value. There is a bit of unnecessary code 
 here as regardless of whether it exists in the map or not, we are re-adding it. Still, it is a very performant alternative compared to the traditional
 recursive approach. This brings us nicely onto the next section which is...
@@ -244,6 +248,9 @@ test = new MyType(1,2,3);
 return test.aTest();
 ```
 Would return the same result.
+
+**NOTE:** Any variables declared within an instance are added to global storage currently. Only those declared within the type paramters and 
+constructors are added locally. This will be fixed as a priority.
 ### Inheritance
 The current model for inheritance only supports extending the functionality and properties of another type. Parents can be defined by using the '<-' 
 notation after the name and optional parameters. For example:
@@ -267,14 +274,75 @@ type definition.
 Functions and resources can be defined in the parent and used within the child class. There is no notion of modifiers yet, so everything is public
 at this early stage.
 ### Constructors
+Constructors work in the same way as the type parameters, but offer different sets of fields. When a class inherits from a type it will
+try and match the parameters against one of these. If no match was found then an error will be thrown. Constructors are defined by using 
+the 'this' keyword with braces and values. For example:
+```
+type ParentType {
+    this(d);
+}
+```
+You can also provide a body to perform other actions in constructor e.g.
+```
+type ParentType {
+    this(d) {
+        d += 3.14;
+    }
+}
+```
+At this early stage, the actual design and implementation of these hasn't been finalised but provides a way to declare dynamic and changing
+types. As mentioned earlier, it is my plan to return to types and their implementation to improve and enhance in the future.
 
-- Parameters
-- Inheritance
-- Constructors
-Imports
-Building / Load from File
-Toolkit Changes
-- Parser flags
+## Building / Load from File
+You can now save your expressions to file in a "compiled" state using SLOPProcessor.tokenizeToFile(expression, path). This provides a
+performance boost as it uses the saved lexer result and loads it straight into the parser. There is no specific file type for either 
+SLOP source files or "compiled" files and as such that decision is up to you. To load a "compiled" source file simply use 
+processor.processFromFile(filePath, SLOPContext).
+
+## Imports
+Following on from the ability to now save and load source files, I am happy to announce the addiiton of the import token. This allows both
+"compiled" and raw source files to be loaded in at runtime. Here is an example of the syntax:
+```
+import 'CompiledSource', @'UncompiledSource.slp';
+```
+As can be seen above, to load an uncompiled source file and use its declared functions, types and other resources, you have to
+precede the declaration with an '@'. This will inform the token that it needs to be pre-compiled first. You can declare multiple imports
+in the same import statement or load them in separate statements e.g.
+```
+import './compiled/CompiledSource';
+import @'./source/UncompiledSource.slp';
+
+/* Call external function in compiled source */
+functionA();
+/* Call external function in uncompiled source */
+functionB();
+```
+
+## Toolkit Changes
+### Parser flags
+During the development of all the aforementioned features, it became apparent that I needed a way for the parser to handle specific types 
+of events or be able to pass messages to others through their response. These events are common across languages and using flags could 
+adopt a common approach within the parser itself (another way to say hardcode!). As such, I added a new field called parserFlags to the 
+Token class. At this stage there are the following flags that can be set:
+```java
+public enum ParserFlag {
+    BREAK,
+    CONTINUE,
+    RETURN,
+    RETURN_GROUP,
+    EXIT
+}
+```
+As previously mentioned, some of these affect the behaviour of parser execution including BREAK, RETURN, CONTINUE and EXIT. Using one 
+of these alters the traditional flow of execution. The RETURN_GROUP also affects the parser in that execution is stopped, but it is
+also used to signal to the parent token to collate the results together - please see the Return Token '&' flag.
+
+You may be looking at the above thinking "but you haven't got...". These were just the immediate set of flags I could think of, but
+that's not to say this won't increase in number in future. Please let me know if there are any I'm missing and I'll do my best to 
+get them added into the next release.
+
+### Variable Types
+
 - Variable Types
     - Instances
     - Prototypes
