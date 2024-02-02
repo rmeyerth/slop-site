@@ -59,7 +59,6 @@ const config = {
             position: 'left',
             label: 'Documentation',
           },
-          {to: '/try-it', label: 'Try it now!', position: 'left'},
           {to: '/license', label: 'License', position: 'left'},
           {
             href: 'https://gitlab.com/tronied/slop',
